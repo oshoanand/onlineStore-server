@@ -1,0 +1,98 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+.pnpm-lock.yaml
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.prod
+.env.development
+.env.test
+.env.staging
+
+# Build and dist
+dist/
+build/
+out/
+.next/
+.nuxt/
+*.tgz
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# IDE and Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.sublime-project
+*.sublime-workspace
+.project
+.settings/
+.metadata
+
+# Testing
+coverage/
+.nyc_output/
+.pytest_cache/
+.mocha_timeout
+.test_cache
+
+# Turbo
+.turbo/
+.turbo
+
+# Docker
+docker-compose.override.yml
+docker-compose.yml
+
+# OS
+.DS_Store
+Thumbs.db
+.windows-build-helper/
+*.exe
+
+# Temp and cache
+tmp/
+temp/
+*.cache
+.cache/
+
+# Node
+.npm
+.eslintcache
+.node_repl_history
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Output of 'npm pack'
+*.wpack
+
+# Misc
+*.bak
+*.swp
+.env.*.local
+.idea
+
+# Prisma
+prisma/migrations/dev.db
+prisma/dev.db
+dev.db
+
+serviceAccountKey.json

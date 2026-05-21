@@ -1,0 +1,67 @@
+generator client {
+    provider        = "prisma-client"
+    output          = "../src/generated/prisma"
+    previewFeatures = ["views"]
+}
+
+datasource db {
+    provider = "postgresql"
+    schemas  = ["shop_notification"]
+}
+
+// ==========================================
+// 1. STANDARD NOTIFICATIONS
+// ==========================================
+model Notification {
+    id        String   @id @default(uuid())
+    userId    String
+    title     String
+    message   String
+    type      String // e.g., 'ORDER_UPDATE', 'PROMOTION', 'SECURITY'
+    isRead    Boolean  @default(false)
+    createdAt DateTime @default(now())
+
+    @@index([userId])
+    @@index([createdAt])
+    @@schema("shop_notification")
+}
+
+// ==========================================
+// 2. ADVANCED REAL-TIME CHAT
+// ==========================================
+model ChatMessage {
+    id         String @id @default(uuid())
+    roomId     String // e.g., order_123 or user_456
+    senderId   String
+    senderRole String // "CUSTOMER" or "ADMINISTRATOR"
+
+    content String? @db.Text
+
+    // File Attachments (MinIO)
+    fileUrl  String?
+    fileName String?
+    fileType String?
+    fileSize Int?
+
+    // Message State
+    isRead    Boolean @default(false) // For the double blue checkmark
+    isDeleted Boolean @default(false) // Soft delete flag
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([roomId])
+    @@index([createdAt])
+    @@schema("shop_notification")
+}
+
+// ==========================================
+// 3. USER PRESENCE (ONLINE/OFFLINE)
+// ==========================================
+model UserPresence {
+    userId   String   @id
+    isOnline Boolean  @default(false)
+    lastSeen DateTime @default(now())
+
+    @@schema("shop_notification")
+}

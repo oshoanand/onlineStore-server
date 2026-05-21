@@ -1,0 +1,96 @@
+generator client {
+    provider        = "prisma-client"
+    output          = "../src/generated/prisma"
+    previewFeatures = ["views"]
+}
+
+datasource db {
+    provider = "postgresql"
+    schemas  = ["shop_order"]
+}
+
+enum OrderStatus {
+    PENDING // Initial state, waiting for inventory check
+    AWAITING_PAYMENT // Inventory reserved, waiting for payment
+    CONFIRMED // Payment successful (or COD confirmed)
+    PROCESSING // Getting ready for shipping
+    SHIPPED // Handed over to courier
+    OUT_FOR_DELIVERY // Courier is out to deliver
+    DELIVERED // Successfully delivered
+    CANCELLED // Payment failed or out of stock
+
+    @@schema("shop_order")
+}
+
+enum PaymentMode {
+    CARD
+    CASH
+    UPI
+    WALLET
+    NET_BANKING
+
+    @@schema("shop_order")
+}
+
+enum PaymentType {
+    PREPAID
+    POSTPAID // e.g., Cash on Delivery
+
+    @@schema("shop_order")
+}
+
+model Order {
+    id     String      @id @default(uuid())
+    userId String // Extracted from X-User-Id header
+    status OrderStatus @default(PENDING)
+
+    // --- New Payment Fields ---
+    paymentMode      PaymentMode
+    paymentType      PaymentType
+    deliveryAuthCode String // 4-digit code for courier authenticity
+
+    totalAmount     Decimal @db.Decimal(10, 2)
+    shippingCost    Decimal @db.Decimal(10, 2)
+    shippingAddress Json // Snapshot of address { street, city, zip, phone }
+    cancelReason    String? // Why it was cancelled (if applicable)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    items   OrderItem[]
+    history OrderHistory[]
+
+    @@index([userId])
+    @@schema("shop_order")
+}
+
+model OrderItem {
+    id          String  @id @default(uuid())
+    orderId     String
+    order       Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+    productId   String
+    productName String // Snapshot of name
+    quantity    Int
+    priceAtTime Decimal @db.Decimal(10, 2)
+
+    @@schema("shop_order")
+}
+
+model OrderHistory {
+    id      String @id @default(uuid())
+    orderId String
+    order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+    action    String // e.g., "CREATED", "STATUS_UPDATED", "PAYMENT_FAILED", "DELIVERED"
+    oldStatus String? // Nullable for initial creation
+    newStatus String
+
+    userId   String // Who did it (Customer ID, Admin ID, Courier ID, or "SYSTEM")
+    userRole String // "CUSTOMER", "ADMIN", "COURIER", "SYSTEM"
+    notes    String? // Optional context
+
+    createdAt DateTime @default(now())
+
+    @@index([orderId])
+    @@schema("shop_order")
+}

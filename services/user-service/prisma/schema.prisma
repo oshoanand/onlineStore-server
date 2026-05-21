@@ -1,0 +1,296 @@
+generator client {
+    provider        = "prisma-client"
+    output          = "../src/generated/prisma"
+    previewFeatures = ["views"]
+}
+
+datasource db {
+    provider = "postgresql"
+    schemas  = ["shop_user"]
+}
+
+// ==========================================
+// ENUMS
+// ==========================================
+enum Role {
+    CUSTOMER
+    ADMINISTRATOR
+    SUPPORT
+
+    @@schema("shop_user")
+}
+
+enum SupportStatus {
+    PENDING
+    RESOLVED
+
+    @@schema("shop_user")
+}
+
+enum UserStatus {
+    ACTIVE
+    INACTIVE
+    BLOCKED
+
+    @@schema("shop_user")
+}
+
+// ==========================================
+// CORE AUTHENTICATION & IDENTITY
+// ==========================================
+model User {
+    id            String     @id @default(cuid())
+    email         String?    @unique
+    mobile        String     @unique
+    password      String
+    emailVerified DateTime?
+    role          Role       @default(CUSTOMER)
+    status        UserStatus @default(ACTIVE)
+    fcmTokens     String[] // Array allows multiple devices (phone, web, tablet)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // --- 1:1 Profile Relations ---
+    customerProfile      CustomerProfile?
+    administratorProfile AdministratorProfile?
+
+    // --- Auth Relations (NextAuth Standard) ---
+    accounts           Account[]
+    sessions           Session[]
+    verificationTokens VerificationToken[]
+
+    // --- System Actions ---
+    supports        Support[]
+    articles        Article[]
+    articleComments ArticleComment[]
+    articleLikes    ArticleLike[]
+
+    @@schema("shop_user")
+}
+
+// ==========================================
+// CUSTOMER DOMAIN
+// ==========================================
+model CustomerProfile {
+    id     String @id @default(uuid())
+    userId String @unique
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    // Personal Info
+    fullName     String
+    profilePhoto String?
+
+    // Default Quick Address Info
+    city        String?
+    state       String?
+    pincode     String?
+    fullAddress String? @db.Text
+
+    // Complex Relations
+    addresses Address[]
+    bankCards BankCard[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@schema("shop_user")
+}
+
+model Address {
+    id                String          @id @default(uuid())
+    customerProfileId String
+    customerProfile   CustomerProfile @relation(fields: [customerProfileId], references: [id], onDelete: Cascade)
+
+    tag       String? // e.g., "Home", "Office"
+    street    String
+    city      String
+    state     String
+    pincode   String
+    isDefault Boolean @default(false)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([customerProfileId])
+    @@schema("shop_user")
+}
+
+model BankCard {
+    id                String          @id @default(uuid())
+    customerProfileId String
+    customerProfile   CustomerProfile @relation(fields: [customerProfileId], references: [id], onDelete: Cascade)
+
+    // Masked details for UI display (NEVER store real PAN/CVV)
+    cardHolderName String
+    maskedNumber   String // e.g., "**** **** **** 4242"
+    cardType       String // e.g., "Visa", "Mastercard"
+    expiryMonth    Int
+    expiryYear     Int
+
+    // Token used to charge the card via Payment Gateway (Stripe)
+    paymentMethodId String?
+
+    isDefault Boolean  @default(false)
+    createdAt DateTime @default(now())
+
+    @@index([customerProfileId])
+    @@schema("shop_user")
+}
+
+// ==========================================
+// ADMINISTRATOR DOMAIN
+// ==========================================
+model AdministratorProfile {
+    id     String @id @default(uuid())
+    userId String @unique
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    fullName String
+
+    profilePhoto String?
+    department   String? // e.g., "Fulfillment", "Support", "SuperAdmin"
+    employeeId   String? @unique
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@schema("shop_user")
+}
+
+// ==========================================
+// NEXTAUTH STANDARD MODELS
+// ==========================================
+model Account {
+    id                String  @id @default(cuid())
+    userId            String
+    type              String
+    provider          String
+    providerAccountId String
+    refresh_token     String? @db.Text
+    access_token      String? @db.Text
+    expires_at        Int?
+    token_type        String?
+    scope             String?
+    id_token          String? @db.Text
+    session_state     String?
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([provider, providerAccountId])
+    @@index([userId])
+    @@schema("shop_user")
+}
+
+model Session {
+    id           String   @id @default(cuid())
+    userId       String
+    expires      DateTime
+    sessionToken String   @unique
+    accessToken  String   @unique
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+    @@schema("shop_user")
+}
+
+model VerificationToken {
+    id         String    @id @default(cuid())
+    identifier String?
+    userId     String?
+    token      String    @unique
+    expires    DateTime?
+
+    user User? @relation(fields: [userId], references: [id])
+
+    @@unique([identifier, token])
+    @@index([userId])
+    @@schema("shop_user")
+}
+
+// ==========================================
+// APP FEATURES (Support & Blog)
+// ==========================================
+model Support {
+    id         String @id @default(uuid())
+    postedById String
+    postedBy   User   @relation(fields: [postedById], references: [id]) // FIX: Changed from 'mobile' to 'id' for stability
+
+    mobile     String
+    queryType  String
+    message    String        @db.Text
+    photo      String?
+    status     SupportStatus @default(PENDING)
+    adminReply String?       @db.Text
+
+    resolvedAt DateTime?
+    createdAt  DateTime  @default(now())
+    updatedAt  DateTime  @updatedAt
+
+    @@index([postedById])
+    @@schema("shop_user")
+}
+
+model Article {
+    id       String @id @default(uuid())
+    authorId String
+    author   User   @relation(fields: [authorId], references: [id])
+
+    title           String
+    content         String  @db.Text
+    slug            String  @unique
+    mediaUrl        String?
+    mediaType       String?
+    metaTitle       String?
+    imageAltText    String?
+    metaDescription String? @db.Text
+    keywords        String?
+    isActive        Boolean @default(false)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    comments ArticleComment[]
+    likes    ArticleLike[]
+
+    @@index([authorId])
+    @@schema("shop_user")
+}
+
+model ArticleComment {
+    id        String  @id @default(uuid())
+    articleId String
+    article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+    userId    String
+    user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    content String @db.Text
+    status  String @default("pending")
+
+    parentId String?
+    parent   ArticleComment?  @relation("NestedComments", fields: [parentId], references: [id], onDelete: Cascade)
+    replies  ArticleComment[] @relation("NestedComments")
+
+    createdAt DateTime @default(now())
+
+    @@index([articleId])
+    @@index([userId])
+    @@index([parentId])
+    @@schema("shop_user")
+}
+
+model ArticleLike {
+    id        String  @id @default(uuid())
+    articleId String
+    article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+    userId    String
+    user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([articleId, userId])
+    @@index([articleId])
+    @@index([userId])
+    @@schema("shop_user")
+}

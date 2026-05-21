@@ -1,0 +1,118 @@
+generator client {
+    provider        = "prisma-client"
+    output          = "../src/generated/prisma"
+    previewFeatures = ["views"]
+}
+
+datasource db {
+    provider = "postgresql"
+    schemas  = ["shop_product"]
+}
+
+model Product {
+    id   String  @id @default(uuid())
+    name String
+    slug String  @unique // For SEO-friendly URLs
+    sku  String? @unique // Stock Keeping Unit
+
+    // Descriptions
+    description         String  @db.Text // Short description
+    detailedDescription String? @db.Text // For Rich Text Editor content
+    brand               String? // Manufacturer or brand
+
+    // Pricing
+    price           Decimal  @db.Decimal(10, 2)
+    discountedPrice Decimal? @db.Decimal(10, 2)
+
+    // Inventory & Status
+    inStock     Int           @default(0)
+    status      ProductStatus @default(ACTIVE)
+    isPublished Boolean       @default(true)
+
+    // Physical Specs & Variants
+    weight     String? // e.g., "500g" or "1.2kg"
+    dimensions String? // e.g., "10x20x5 cm" (LxBxH)
+    color      String? // Base color
+    variants   Json? // e.g., [{ "size": "L", "color": "Red", "stock": 5 }]
+
+    // Categorization & Discovery
+    categories Category[] @relation("ProductCategories")
+
+    tags String[] // e.g., ["Featured", "Bestseller", "New"]
+
+    // Social Proof (Updated by Review Service via Event Bus)
+    averageRating Float @default(0.0)
+    reviewCount   Int   @default(0)
+
+    // SEO Metadata
+    metaTitle       String?
+    metaDescription String?
+    keywords        String?
+
+    // Media
+    thumbImage String? // Primary thumbnail URL (MinIO)
+    imageArray String[] // Up to 4 additional images
+
+    // Timestamps
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([slug])
+    // FIX: Removed @@index([categories]) as it is a relation, not a scalar field
+    @@index([brand])
+    @@index([status])
+    @@schema("shop_product")
+}
+
+model Category {
+    id          String  @id @default(uuid())
+    name        String
+    slug        String  @unique
+    description String? @db.Text
+    thumbImage  String? // Optional: Category banner/icon
+
+    // --- Hierarchical Self-Relation ---
+    parentId String? // If null, this is a top-level root category
+    parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+    children Category[] @relation("CategoryHierarchy")
+
+    // --- Product Relation ---
+    // FIX: Added the mandatory inverse relation to complete the many-to-many setup
+    products Product[] @relation("ProductCategories")
+
+    // Timestamps
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([slug])
+    @@index([parentId])
+    @@schema("shop_product")
+}
+
+model ShippingZone {
+    id   String @id @default(uuid())
+    name String // e.g., "Moscow Local", "Siberia Remote"
+
+    // Array of normalized (lowercased) city names. 
+    // If empty and isDefault is true, it acts as the fallback zone.
+    cities    String[]
+    isDefault Boolean  @default(false)
+
+    // Costs
+    baseCost              Decimal  @db.Decimal(10, 2)
+    freeShippingThreshold Decimal? @db.Decimal(10, 2) // Null means never free
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@schema("shop_product")
+}
+
+enum ProductStatus {
+    ACTIVE
+    INACTIVE
+    OUT_OF_STOCK
+    ARCHIVED
+
+    @@schema("shop_product")
+}

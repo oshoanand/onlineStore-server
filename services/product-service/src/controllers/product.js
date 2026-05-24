@@ -234,6 +234,72 @@ export const getRelatedProducts = async (req, res, next) => {
 };
 
 // ==========================================
+//  PUBLIC HOMEPAGE GROUPED PRODUCTS
+// ==========================================
+// Fetches multiple lists of products grouped by tags in a single API call.
+// Example: ?tags=Bestseller,New,Sale
+export const getGroupedProducts = async (req, res, next) => {
+  try {
+    // Default tags to fetch if none are specified
+    const requestedTags = req.query.tags
+      ? req.query.tags.split(",")
+      : ["Bestseller", "New", "Sale"];
+
+    const dbQuery = async () => {
+      const results = {};
+
+      // Fetch all requested tag groups in parallel for maximum speed
+      await Promise.all(
+        requestedTags.map(async (tag) => {
+          const cleanTag = tag.trim();
+
+          const products = await prisma.product.findMany({
+            where: {
+              isPublished: true,
+              status: "ACTIVE",
+              tags: { has: cleanTag }, // Matches the specific tag inside the String[] array
+            },
+            take: 8, // Ideal number for a horizontal scrolling carousel
+            orderBy: { createdAt: "desc" },
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              brand: true,
+              price: true,
+              discountedPrice: true,
+              thumbImage: true,
+              averageRating: true,
+              reviewCount: true,
+              tags: true,
+            },
+          });
+
+          results[cleanTag] = products;
+        }),
+      );
+
+      return results;
+    };
+
+    const cacheKey = `grouped_tags:${requestedTags.join("_")}`;
+    const groupedData = await fetchCached(
+      CACHE_PREFIX,
+      cacheKey,
+      dbQuery,
+      3600,
+    );
+
+    res.status(200).json({ success: true, data: groupedData });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ==========================================
+// ADMIN: CREATE PRODUCT
+// ==========================================
+// ==========================================
 // ADMIN: CREATE PRODUCT
 // ==========================================
 export const createProduct = async (req, res, next) => {
@@ -254,10 +320,11 @@ export const createProduct = async (req, res, next) => {
       dimensions,
       color,
       categoryId,
-      subCategoryId, // Updated fields
+      subCategoryId,
       metaTitle,
       metaDescription,
       keywords,
+      tags,
     } = req.body;
 
     // 1. Prepare Category Connections (Prisma Many-to-Many Syntax)
@@ -266,7 +333,67 @@ export const createProduct = async (req, res, next) => {
     if (subCategoryId && subCategoryId !== "none")
       categoryConnect.push({ id: subCategoryId });
 
-    // 2. Handle Images (As before)
+    // Safely parse tags string into an array
+    const parsedTags = parseFormDataField(tags) || [];
+
+    // ==========================================
+    // 🚨 NEW: SEO AUTO-GENERATION LOGIC
+    // ==========================================
+    let finalMetaTitle = metaTitle;
+    let finalMetaDescription = metaDescription;
+    let finalKeywords = keywords;
+
+    if (!finalMetaTitle) {
+      finalMetaTitle = name;
+    }
+
+    if (!finalMetaDescription) {
+      // SEO best practice: keep description around 160 characters
+      finalMetaDescription = description ? description.substring(0, 160) : name;
+    }
+
+    if (!finalKeywords && name && description) {
+      // Combine name and description, lowercase, remove punctuation (supports English & Russian)
+      const cleanText = `${name} ${description}`
+        .toLowerCase()
+        .replace(/<[^>]*>?/gm, " ") // Strip any HTML tags if present
+        .replace(/[^\w\sа-яА-ЯёЁ]/gi, " "); // Remove punctuation
+
+      const wordsArray = cleanText.split(/\s+/);
+
+      // Common stop words to ignore
+      const stopWords = new Set([
+        "and",
+        "the",
+        "for",
+        "with",
+        "in",
+        "of",
+        "to",
+        "is",
+        "on",
+        "и",
+        "в",
+        "во",
+        "на",
+        "с",
+        "по",
+        "для",
+        "от",
+        "или",
+      ]);
+
+      // Filter out stop words and short words
+      const validWords = wordsArray.filter(
+        (w) => w.length > 2 && !stopWords.has(w),
+      );
+
+      // Get unique words and take up to 8 of them for keywords
+      const uniqueWords = [...new Set(validWords)];
+      finalKeywords = uniqueWords.slice(0, 8).join(", ");
+    }
+
+    // 2. Handle Images
     let thumbUrl = null;
     let imagesUrls = [];
     if (req.files?.thumbImage)
@@ -300,12 +427,13 @@ export const createProduct = async (req, res, next) => {
         weight,
         dimensions,
         color,
-        metaTitle,
-        metaDescription,
-        keywords,
+        // Apply the computed SEO fields here
+        metaTitle: finalMetaTitle,
+        metaDescription: finalMetaDescription,
+        keywords: finalKeywords,
         thumbImage: thumbUrl,
         imageArray: imagesUrls,
-
+        tags: parsedTags,
         categories: {
           connect: categoryConnect,
         },
@@ -318,20 +446,28 @@ export const createProduct = async (req, res, next) => {
     next(error);
   }
 };
-
 // ==========================================
 // ADMIN: UPDATE PRODUCT
 // ==========================================
-
 export const updateProduct = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    //  Destructure existingImages here so it is NOT included in updateData
-    const { categoryId, subCategoryId, existingImages, ...updateData } =
-      req.body;
+    // Destructure out the relations, images, tags, and explicitly grab SEO/Text fields
+    const {
+      categoryId,
+      subCategoryId,
+      existingImages,
+      tags,
+      metaTitle,
+      metaDescription,
+      keywords,
+      name,
+      description,
+      ...restUpdateData
+    } = req.body;
 
-    // 1. Fetch the existing product to handle image fallbacks and slug
+    // 1. Fetch the existing product to handle image fallbacks, slugs, and SEO generation
     const existingProduct = await prisma.product.findUnique({ where: { id } });
     if (!existingProduct) {
       const error = new Error("Product not found");
@@ -339,7 +475,72 @@ export const updateProduct = async (req, res, next) => {
       throw error;
     }
 
-    const slugToUse = updateData.slug || existingProduct.slug;
+    const slugToUse = restUpdateData.slug || existingProduct.slug;
+
+    // ==========================================
+    // 🚨 NEW: SEO AUTO-GENERATION LOGIC (UPDATE)
+    // ==========================================
+    // Determine the effective text values (use updated ones if provided, else existing)
+    const effectiveName = name !== undefined ? name : existingProduct.name;
+    const effectiveDescription =
+      description !== undefined ? description : existingProduct.description;
+
+    // Determine the effective SEO values
+    let finalMetaTitle =
+      metaTitle !== undefined ? metaTitle : existingProduct.metaTitle;
+    let finalMetaDescription =
+      metaDescription !== undefined
+        ? metaDescription
+        : existingProduct.metaDescription;
+    let finalKeywords =
+      keywords !== undefined ? keywords : existingProduct.keywords;
+
+    // Auto-generate if empty or cleared by the user
+    if (!finalMetaTitle) {
+      finalMetaTitle = effectiveName;
+    }
+
+    if (!finalMetaDescription) {
+      finalMetaDescription = effectiveDescription
+        ? effectiveDescription.substring(0, 160)
+        : effectiveName;
+    }
+
+    if (!finalKeywords && effectiveName && effectiveDescription) {
+      const cleanText = `${effectiveName} ${effectiveDescription}`
+        .toLowerCase()
+        .replace(/<[^>]*>?/gm, " ")
+        .replace(/[^\w\sа-яА-ЯёЁ]/gi, " ");
+
+      const wordsArray = cleanText.split(/\s+/);
+      const stopWords = new Set([
+        "and",
+        "the",
+        "for",
+        "with",
+        "in",
+        "of",
+        "to",
+        "is",
+        "on",
+        "и",
+        "в",
+        "во",
+        "на",
+        "с",
+        "по",
+        "для",
+        "от",
+        "или",
+      ]);
+
+      const validWords = wordsArray.filter(
+        (w) => w.length > 2 && !stopWords.has(w),
+      );
+      const uniqueWords = [...new Set(validWords)];
+
+      finalKeywords = uniqueWords.slice(0, 8).join(", ");
+    }
 
     // 2. Handle Images
     let thumbUrl = existingProduct.thumbImage;
@@ -380,32 +581,46 @@ export const updateProduct = async (req, res, next) => {
       categoryConnect.push({ id: subCategoryId });
     }
 
+    let updatedTags = undefined;
+    if (tags !== undefined) {
+      updatedTags = parseFormDataField(tags) || [];
+    }
+
     // 4. Update the Database
     const updatedProduct = await prisma.product.update({
       where: { id },
       data: {
-        ...updateData, // <-- existingImages is safely removed from here now
+        ...restUpdateData,
+        name, // Pass name back into update payload
+        description, // Pass description back into update payload
 
-        price: updateData.price ? parseFloat(updateData.price) : undefined,
-        discountedPrice: updateData.discountedPrice
-          ? parseFloat(updateData.discountedPrice)
-          : updateData.discountedPrice === "" ||
-              updateData.discountedPrice === "null"
+        // Apply computed SEO fields
+        metaTitle: finalMetaTitle,
+        metaDescription: finalMetaDescription,
+        keywords: finalKeywords,
+
+        price: restUpdateData.price
+          ? parseFloat(restUpdateData.price)
+          : undefined,
+        discountedPrice: restUpdateData.discountedPrice
+          ? parseFloat(restUpdateData.discountedPrice)
+          : restUpdateData.discountedPrice === "" ||
+              restUpdateData.discountedPrice === "null"
             ? null
             : undefined,
         inStock:
-          updateData.inStock !== undefined
-            ? parseInt(updateData.inStock, 10)
+          restUpdateData.inStock !== undefined
+            ? parseInt(restUpdateData.inStock, 10)
             : undefined,
         isPublished:
-          updateData.isPublished !== undefined
-            ? updateData.isPublished === "true" ||
-              updateData.isPublished === true
+          restUpdateData.isPublished !== undefined
+            ? restUpdateData.isPublished === "true" ||
+              restUpdateData.isPublished === true
             : undefined,
 
         thumbImage: thumbUrl,
         imageArray: imagesUrls,
-
+        tags: updatedTags,
         categories: {
           set: categoryConnect,
         },

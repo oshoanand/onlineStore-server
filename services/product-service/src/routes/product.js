@@ -3,6 +3,7 @@ import {
   getPublicProducts,
   getPublicProductBySlug,
   getRelatedProducts,
+  getGroupedProducts,
   getAdminProducts,
   getProductById,
   createProduct,
@@ -18,14 +19,14 @@ const router = express.Router();
 const upload = createUploader(10);
 
 // ==========================================
-// 1. PUBLIC STOREFRONT ROUTES (No Auth Required)
+// 1. PUBLIC STOREFRONT ROUTES
 // ==========================================
+//  Fetch multiple tagged carousels at once for the Homepage
+router.get("/public/grouped", getGroupedProducts);
 // Advanced filtering, sorting, sentence search, and pagination
 router.get("/public/all", getPublicProducts);
-
 // SEO-friendly product fetching by slug
 router.get("/public/slug/:slug", getPublicProductBySlug);
-
 // Cross-selling: Get related products based on categories
 router.get("/public/:id/related", getRelatedProducts);
 

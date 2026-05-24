@@ -16,7 +16,7 @@ const upload = createUploader(5); // 5MB limit for category icons
 // 1. PUBLIC STOREFRONT ROUTES
 // ==========================================
 // Fetch the entire category hierarchy (Extremely fast, served from Redis)
-router.get("/public/tree", getCategoryTree);
+router.get("/all/tree", getCategoryTree);
 
 // ==========================================
 // 2. ADMIN PROTECTED ROUTES

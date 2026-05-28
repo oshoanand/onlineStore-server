@@ -6,6 +6,7 @@ import { NotFoundError, BadRequestError, logger } from "@shop/utils";
 /**
  * Called by the frontend to get the Stripe Client Secret before rendering the card element.
  */
+
 export const createPaymentIntent = async (req, res, next) => {
   try {
     const { orderId } = req.params;
@@ -19,10 +20,19 @@ export const createPaymentIntent = async (req, res, next) => {
       throw new NotFoundError("Payment record not found for this order");
     if (transaction.userId !== userId)
       throw new BadRequestError("Unauthorized to pay for this order");
-    if (transaction.status !== "PENDING")
+
+    // 🚨 SECURITY FIX: Reject attempts to pay online for a Cash on Delivery order
+    if (transaction.status === "CASH_ON_DELIVERY") {
+      throw new BadRequestError(
+        "This order is set to Postpaid (Cash on Delivery) and does not require online payment.",
+      );
+    }
+
+    if (transaction.status !== "PENDING") {
       throw new BadRequestError(
         `Order payment status is ${transaction.status}`,
       );
+    }
 
     let stripeIntentId = transaction.stripeIntentId;
     let clientSecret = null;
@@ -31,19 +41,15 @@ export const createPaymentIntent = async (req, res, next) => {
       const intent = await stripe.paymentIntents.retrieve(stripeIntentId);
       clientSecret = intent.client_secret;
     } else {
-      // Create a new PaymentIntent with Stripe.
-      // Stripe expects amounts in the smallest currency unit (e.g., kopecks for RUB, cents for USD).
       const intent = await stripe.paymentIntents.create({
         amount: Math.round(parseFloat(transaction.amount) * 100),
         currency: transaction.currency || "rub",
-        // CRITICAL: Embed userId here so the Webhook has context without needing a DB lookup!
         metadata: { orderId: transaction.orderId, userId: transaction.userId },
       });
 
       stripeIntentId = intent.id;
       clientSecret = intent.client_secret;
 
-      // Update DB with the Stripe ID
       await prisma.paymentTransaction.update({
         where: { id: transaction.id },
         data: { stripeIntentId },

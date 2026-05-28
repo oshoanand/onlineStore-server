@@ -6,6 +6,7 @@ generator client {
 
 datasource db {
     provider = "postgresql"
+    schemas  = ["shop_payment"]
 }
 
 enum PaymentStatus {
@@ -14,6 +15,9 @@ enum PaymentStatus {
     FAILED
     CANCELLED
     REFUNDED
+    CASH_ON_DELIVERY
+
+    @@schema("shop_payment")
 }
 
 model PaymentTransaction {
@@ -29,4 +33,5 @@ model PaymentTransaction {
     updatedAt      DateTime      @updatedAt
 
     @@index([userId])
+    @@schema("shop_payment")
 }

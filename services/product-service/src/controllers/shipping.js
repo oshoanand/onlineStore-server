@@ -9,6 +9,12 @@ const CACHE_PREFIX = "productSvc:shipping";
 export const calculateShippingCost = async (req, res, next) => {
   try {
     const { city, cartTotal } = req.body;
+    console.log(
+      "Calculating shipping cost for city:",
+      city,
+      "and cart total:",
+      cartTotal,
+    );
     const total = parseFloat(cartTotal) || 0;
     const searchCity = city ? city.trim().toLowerCase() : "";
 

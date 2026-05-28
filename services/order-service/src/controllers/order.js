@@ -1,6 +1,7 @@
 import prisma from "../config/prisma.js";
 import { publishEvent } from "@shop/event-bus";
 import { NotFoundError, BadRequestError, logger } from "@shop/utils";
+import { invalidatePattern, fetchCached } from "@shop/event-bus/src/redis.js";
 import axios from "axios";
 import crypto from "crypto";
 
@@ -8,91 +9,265 @@ import crypto from "crypto";
 // HELPER: Generate 4-digit Secure PIN
 // ==========================================
 const generateDeliveryPin = () => {
-  // Generates a random number between 1000 and 9999
   return crypto.randomInt(1000, 10000).toString();
+};
+
+// ==========================================
+// HELPER: Generate 8-digit Order Id
+// ==========================================
+const generateOrderId = () => {
+  // 1. Get current timestamp in milliseconds
+  const timestamp = Date.now().toString();
+  // 2. Generate random bytes to ensure uniqueness within the same millisecond
+  const salt = crypto.randomBytes(4).toString("hex");
+  // 3. Create a SHA-256 hash of the combined string
+  const hash = crypto
+    .createHash("sha256")
+    .update(timestamp + salt)
+    .digest("hex");
+  // 4. Convert part of the hash to a number and take the last 8 digits
+  // We parse a portion of the hex as an integer to get numeric digits
+  const numericId = parseInt(hash.substring(0, 8), 16);
+  // 5. Ensure it is exactly 8 digits by using modulo and padding
+  return (numericId % 100000000).toString().padStart(8, "0");
 };
 
 // ==========================================
 // 1. CUSTOMER: CREATE ORDER
 // ==========================================
+
+// export const createOrder = async (req, res, next) => {
+//   try {
+//     const { items, shippingAddress, paymentMethod, paymentType } = req.body;
+//     const userId = req.user.id;
+//     const userRole = req.user.role || "CUSTOMER";
+
+//     // --- A. STRICT INPUT VALIDATION ---
+//     if (!items || items.length === 0)
+//       throw new BadRequestError("Order items cannot be empty");
+//     if (!shippingAddress || !shippingAddress.city)
+//       throw new BadRequestError(
+//         "Shipping address with a valid city is required",
+//       );
+
+//     // Validate Payment Type securely
+//     if (!["PREPAID", "POSTPAID"].includes(paymentType)) {
+//       throw new BadRequestError(
+//         "Invalid paymentType. Must be PREPAID or POSTPAID.",
+//       );
+//     }
+//     if (!paymentMethod)
+//       throw new BadRequestError("Payment method is required.");
+
+//     const productServiceUrl =
+//       process.env.PRODUCT_SERVICE_URL || "http://product-service:4003";
+
+//     // --- B. SECURE PRICE & INVENTORY CALCULATION ---
+//     const verifiedItems = await Promise.all(
+//       items.map(async (item) => {
+//         try {
+//           const { data: response } = await axios.get(
+//             `${productServiceUrl}/internal/${item.productId}`,
+//             {
+//               headers: { "x-internal-secret": process.env.INTERNAL_API_SECRET },
+//             },
+//           );
+
+//           const product = response.data;
+//           if (!product || product.status !== "ACTIVE") {
+//             throw new BadRequestError(
+//               `Product ${item.productName || item.productId} is no longer available.`,
+//             );
+//           }
+//           if (product.inStock < item.quantity) {
+//             throw new BadRequestError(
+//               `Only ${product.inStock} left in stock for ${product.name}.`,
+//             );
+//           }
+
+//           const actualPrice = product.discountedPrice
+//             ? parseFloat(product.discountedPrice)
+//             : parseFloat(product.price);
+//           return {
+//             productId: product.id,
+//             productName: product.name,
+//             quantity: item.quantity,
+//             priceAtTime: actualPrice,
+//           };
+//         } catch (error) {
+//           logger.error(
+//             `[Order Validation] Failed for product ${item.productId}: ${error.message}`,
+//           );
+//           throw new BadRequestError(
+//             error.response?.data?.message ||
+//               `Failed to verify product: ${item.productName || item.productId}`,
+//           );
+//         }
+//       }),
+//     );
+
+//     const itemsTotal = verifiedItems.reduce(
+//       (sum, item) => sum + item.priceAtTime * item.quantity,
+//       0,
+//     );
+
+//     // --- C. SECURE SHIPPING CALCULATION ---
+//     let shippingCost = 0;
+//     try {
+//       const { data: shippingRes } = await axios.post(
+//         `${productServiceUrl}/public/shipping/calculate`,
+//         { city: shippingAddress.city, cartTotal: itemsTotal },
+//       );
+//       shippingCost = shippingRes.data.shippingCost;
+//     } catch (error) {
+//       logger.error(
+//         `[Order Validation] Failed to calculate shipping: ${error.message}`,
+//       );
+//       throw new BadRequestError(
+//         "Could not calculate shipping for the provided address.",
+//       );
+//     }
+
+//     const finalTotalAmount = itemsTotal + shippingCost;
+//     const deliveryAuthCode = generateDeliveryPin();
+//     const orderId = generateOrderId();
+
+//     // --- D. ATOMIC DATABASE SAVE ---
+//     const order = await prisma.order.create({
+//       data: {
+//         userId,
+//         orderId,
+//         totalAmount: finalTotalAmount,
+//         shippingCost,
+//         shippingAddress,
+//         paymentMethod,
+//         paymentType,
+//         deliveryAuthCode,
+//         status: "PENDING",
+//         items: {
+//           create: verifiedItems.map((item) => ({
+//             productId: item.productId,
+//             productName: item.productName,
+//             quantity: item.quantity,
+//             priceAtTime: item.priceAtTime,
+//           })),
+//         },
+//         history: {
+//           create: {
+//             action: "CREATED",
+//             oldStatus: null,
+//             newStatus: "PENDING",
+//             userId,
+//             userRole,
+//             notes: `Order placed successfully. Selected: ${paymentType} via ${paymentMethod}.`,
+//           },
+//         },
+//       },
+//       include: { items: true },
+//     });
+
+//     // --- E. PUBLISH EVENT (Including paymentType) ---
+//     await publishEvent("stream:orders", {
+//       eventType: "OrderCreated",
+//       orderId: order.orderId,
+//       dbOrderId: order.id, // Internal DB ID
+//       userId: order.userId,
+//       paymentType: order.paymentType,
+//       totalAmount: finalTotalAmount,
+//       items: order.items.map((i) => ({
+//         productId: i.productId,
+//         quantity: i.quantity,
+//       })),
+//     });
+
+//     res.status(201).json({
+//       status: "success",
+//       data: {
+//         ...order,
+//         summary: { itemsTotal, shippingCost, finalTotalAmount },
+//       },
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
 export const createOrder = async (req, res, next) => {
   try {
-    const { items, shippingAddress, paymentMode, paymentType } = req.body;
+    const { items, shippingAddress, paymentMethod, paymentType } = req.body;
     const userId = req.user.id;
     const userRole = req.user.role || "CUSTOMER";
 
-    if (!items || items.length === 0) {
+    // --- A. STRICT INPUT VALIDATION ---
+    if (!items || items.length === 0)
       throw new BadRequestError("Order items cannot be empty");
-    }
-    if (!shippingAddress || !shippingAddress.city) {
+    if (!shippingAddress || !shippingAddress.city)
       throw new BadRequestError(
         "Shipping address with a valid city is required",
       );
+    if (!["PREPAID", "POSTPAID"].includes(paymentType)) {
+      throw new BadRequestError(
+        "Invalid paymentType. Must be PREPAID or POSTPAID.",
+      );
     }
-    if (!paymentMode || !paymentType) {
-      throw new BadRequestError("Payment mode and payment type are required");
-    }
+    if (!paymentMethod)
+      throw new BadRequestError("Payment method is required.");
 
     const productServiceUrl =
       process.env.PRODUCT_SERVICE_URL || "http://product-service:4003";
 
-    let itemsTotal = 0;
-    const verifiedItems = [];
-
-    // --- A. SECURE PRICE & INVENTORY CALCULATION ---
-    await Promise.all(
+    // --- B. SECURE PRICE & INVENTORY CALCULATION ---
+    // (Your existing verification logic remains unchanged...)
+    const verifiedItems = await Promise.all(
       items.map(async (item) => {
         try {
           const { data: response } = await axios.get(
-            `${productServiceUrl}/products/admin/${item.productId}`,
+            `${productServiceUrl}/internal/${item.productId}`,
             {
               headers: { "x-internal-secret": process.env.INTERNAL_API_SECRET },
             },
           );
-
           const product = response.data;
-
-          if (!product || product.status !== "ACTIVE") {
+          if (!product || product.status !== "ACTIVE")
             throw new BadRequestError(
               `Product ${item.productName || item.productId} is no longer available.`,
             );
-          }
-
-          if (product.inStock < item.quantity) {
+          if (product.inStock < item.quantity)
             throw new BadRequestError(
               `Only ${product.inStock} left in stock for ${product.name}.`,
             );
-          }
 
           const actualPrice = product.discountedPrice
             ? parseFloat(product.discountedPrice)
             : parseFloat(product.price);
-
-          itemsTotal += actualPrice * item.quantity;
-
-          verifiedItems.push({
+          return {
             productId: product.id,
             productName: product.name,
             quantity: item.quantity,
             priceAtTime: actualPrice,
-          });
+          };
         } catch (error) {
           logger.error(
             `[Order Validation] Failed for product ${item.productId}: ${error.message}`,
           );
           throw new BadRequestError(
             error.response?.data?.message ||
-              `Failed to verify product: ${item.productName}`,
+              `Failed to verify product: ${item.productName || item.productId}`,
           );
         }
       }),
     );
 
-    // --- B. SECURE SHIPPING CALCULATION ---
+    const itemsTotal = verifiedItems.reduce(
+      (sum, item) => sum + item.priceAtTime * item.quantity,
+      0,
+    );
+
+    // --- C. SECURE SHIPPING CALCULATION ---
     let shippingCost = 0;
     try {
       const { data: shippingRes } = await axios.post(
-        `${productServiceUrl}/products/shipping/public/calculate`,
+        `${productServiceUrl}/public/shipping/calculate`,
         { city: shippingAddress.city, cartTotal: itemsTotal },
       );
       shippingCost = shippingRes.data.shippingCost;
@@ -107,18 +282,25 @@ export const createOrder = async (req, res, next) => {
 
     const finalTotalAmount = itemsTotal + shippingCost;
     const deliveryAuthCode = generateDeliveryPin();
+    const orderId = generateOrderId();
 
-    // --- C. SAVE ORDER & HISTORY TO DATABASE ---
+    // 🚨 LOGIC BRANCH: Determine initial status based on payment type
+    // If it's Cash on Delivery, we consider the order CONFIRMED instantly.
+    // If it's Prepaid, it's PENDING until Stripe confirms it.
+    const initialStatus = paymentType === "POSTPAID" ? "CONFIRMED" : "PENDING";
+
+    // --- D. ATOMIC DATABASE SAVE ---
     const order = await prisma.order.create({
       data: {
         userId,
+        orderId,
         totalAmount: finalTotalAmount,
-        shippingCost: shippingCost,
+        shippingCost,
         shippingAddress,
-        paymentMode,
+        paymentMethod,
         paymentType,
         deliveryAuthCode,
-        status: "PENDING",
+        status: initialStatus,
         items: {
           create: verifiedItems.map((item) => ({
             productId: item.productId,
@@ -127,26 +309,34 @@ export const createOrder = async (req, res, next) => {
             priceAtTime: item.priceAtTime,
           })),
         },
-        // Log the creation immutably
         history: {
           create: {
             action: "CREATED",
             oldStatus: null,
-            newStatus: "PENDING",
+            newStatus: initialStatus,
             userId,
             userRole,
-            notes: `Order placed successfully using ${paymentMode} (${paymentType}).`,
+            notes: `Order placed successfully. Selected: ${paymentType} via ${paymentMethod}.`,
           },
         },
       },
       include: { items: true },
     });
 
-    // --- D. PUBLISH EVENT TO RESERVE INVENTORY ---
+    // Invalidate the user's cached orders list so the new order shows up immediately
+
+    await invalidatePattern(`orders:user:${userId}:*`);
+    await invalidatePattern(`orders:admin:*`);
+
+    // --- E. PUBLISH EVENTS ---
+
+    // 1. Alert the rest of the system (Inventory, Payment) that an order exists
     await publishEvent("stream:orders", {
       eventType: "OrderCreated",
-      orderId: order.id,
+      orderId: order.orderId,
+      dbOrderId: order.id,
       userId: order.userId,
+      paymentType: order.paymentType,
       totalAmount: finalTotalAmount,
       items: order.items.map((i) => ({
         productId: i.productId,
@@ -154,9 +344,24 @@ export const createOrder = async (req, res, next) => {
       })),
     });
 
-    logger.info(
-      `[Order] Created successfully. ID: ${order.id} | Total: ${finalTotalAmount}`,
-    );
+    // 2. 🚨 THE NEW MECHANISM: Trigger Notifications for POSTPAID orders immediately
+    if (paymentType === "POSTPAID") {
+      // Notify the Customer
+      await publishEvent("stream:notifications", {
+        eventType: "ORDER_PLACED",
+        userId: order.userId,
+        orderId: order.orderId,
+      });
+
+      // Notify ALL Administrators
+      await publishEvent("stream:notifications", {
+        eventType: "SYSTEM",
+        targetRole: "ADMINISTRATOR", // The Notification Service will catch this
+        title: "🛍️ New Cash on Delivery Order",
+        message: `Order #${order.orderId} was just placed for ${finalTotalAmount} RUB.`,
+        link: `/admin/orders/${order.id}`,
+      });
+    }
 
     res.status(201).json({
       status: "success",
@@ -171,18 +376,30 @@ export const createOrder = async (req, res, next) => {
 };
 
 // ==========================================
-// 2. CUSTOMER: GET MY ORDERS
+// 2. CUSTOMER: GET MY ORDERS (WITH REDIS CACHE)
 // ==========================================
 export const getUserOrders = async (req, res, next) => {
   try {
-    const orders = await prisma.order.findMany({
-      where: { userId: req.user.id },
-      include: {
-        items: true,
-        history: { orderBy: { createdAt: "desc" } },
+    const userId = req.user.id;
+
+    // We use a static identifier 'list' for the generic list, but this allows for future pagination (e.g., page_1)
+    const orders = await fetchCached(
+      `orders:user:${userId}`, // Resource prefix
+      "list", // Specific ID/Suffix
+      async () => {
+        // Fallback DB Query if cache is missed
+        return await prisma.order.findMany({
+          where: { userId },
+          include: {
+            items: true,
+            history: { orderBy: { createdAt: "desc" } }, // Ensures latest history is first
+          },
+          orderBy: { createdAt: "desc" },
+        });
       },
-      orderBy: { createdAt: "desc" },
-    });
+      3600, // Cache TTL: 1 hour (Optional)
+    );
+
     res.status(200).json({ status: "success", data: orders });
   } catch (error) {
     next(error);
@@ -207,7 +424,7 @@ export const getOrderById = async (req, res, next) => {
 };
 
 // ==========================================
-// 3. ADMIN: GET ALL ORDERS (PAGINATED)
+// 3. ADMIN: GET ALL ORDERS (PAGINATED & CACHED)
 // ==========================================
 export const getAllOrdersAdmin = async (req, res, next) => {
   try {
@@ -216,31 +433,49 @@ export const getAllOrdersAdmin = async (req, res, next) => {
     const skip = (page - 1) * limit;
     const { status, search } = req.query;
 
-    const where = {};
-    if (status && status !== "ALL") {
-      where.status = status;
-    }
-    if (search) {
-      where.OR = [
-        { id: { contains: search, mode: "insensitive" } },
-        { userId: { contains: search, mode: "insensitive" } },
-      ];
-    }
+    // 🚨 1. Construct a highly specific cache suffix
+    // This ensures that different pages, filters, and searches don't overwrite each other in Redis
+    const cacheSuffix = `page_${page}:limit_${limit}:status_${status || "ALL"}:search_${search || "none"}`;
 
-    const [orders, total] = await Promise.all([
-      prisma.order.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { createdAt: "desc" },
-        include: {
-          items: true,
-          // Pulling the latest history log for the admin dashboard overview
-          history: { orderBy: { createdAt: "desc" }, take: 1 },
-        },
-      }),
-      prisma.order.count({ where }),
-    ]);
+    // 🚨 2. Fetch from Redis, or execute the DB query if it's a cache miss
+    const cachedResult = await fetchCached(
+      "orders:admin", // Resource Prefix
+      cacheSuffix, // Unique Suffix
+      async () => {
+        // Fallback Database Query
+        const where = {};
+        if (status && status !== "ALL") {
+          where.status = status;
+        }
+        if (search) {
+          where.OR = [
+            { id: { contains: search, mode: "insensitive" } },
+            { userId: { contains: search, mode: "insensitive" } },
+          ];
+        }
+
+        const [orders, total] = await Promise.all([
+          prisma.order.findMany({
+            where,
+            skip,
+            take: limit,
+            orderBy: { createdAt: "desc" },
+            include: {
+              items: true,
+              history: { orderBy: { createdAt: "desc" }, take: 1 },
+            },
+          }),
+          prisma.order.count({ where }),
+        ]);
+
+        // Return an object containing BOTH results to cache them together
+        return { orders, total };
+      },
+      300, // TTL: 5 minutes. Admin data changes fast, so a short TTL absorbs traffic spikes without showing terribly stale data.
+    );
+
+    // 3. Destructure the result (whether it came from Redis or DB)
+    const { orders, total } = cachedResult;
 
     res.status(200).json({
       success: true,
@@ -265,12 +500,11 @@ export const updateOrderStatus = async (req, res, next) => {
     const { id } = req.params;
     const { status, notes } = req.body;
     const adminId = req.user.id;
-    const adminRole = req.user.role || "ADMIN";
+    const adminRole = req.user.role || "ADMINISTRATOR";
 
     const order = await prisma.order.findUnique({ where: { id } });
     if (!order) throw new NotFoundError("Order not found");
 
-    // Prevent duplicate status updates and spamming the history log
     if (order.status === status) {
       throw new BadRequestError("Order is already in this status");
     }
@@ -279,7 +513,6 @@ export const updateOrderStatus = async (req, res, next) => {
       where: { id },
       data: {
         status,
-        // Log the admin action
         history: {
           create: {
             action: "ADMIN_STATUS_UPDATE",
@@ -293,7 +526,12 @@ export const updateOrderStatus = async (req, res, next) => {
       },
     });
 
-    // --- EVENT ROUTING ---
+    // When an admin updates an order status, invalidate the specific order AND the user's order list
+
+    await invalidatePattern(`orders:user:${order.userId}:*`);
+    await invalidatePattern(`order:detail:${id}`);
+    await invalidatePattern(`orders:admin:*`);
+
     if (status === "SHIPPED") {
       await publishEvent("stream:notifications", {
         eventType: "ORDER_SHIPPED",
@@ -343,9 +581,7 @@ export const verifyCourierDelivery = async (req, res, next) => {
       );
     }
 
-    // --- SECURITY: INVALID PIN CHECK ---
     if (order.deliveryAuthCode !== deliveryAuthCode.toString()) {
-      // Log the failed attempt to prevent internal fraud
       await prisma.orderHistory.create({
         data: {
           orderId: order.id,
@@ -360,7 +596,6 @@ export const verifyCourierDelivery = async (req, res, next) => {
       throw new BadRequestError("Invalid delivery PIN code provided.");
     }
 
-    // --- SECURITY: SUCCESSFUL VERIFICATION ---
     await prisma.order.update({
       where: { id },
       data: {
@@ -379,7 +614,6 @@ export const verifyCourierDelivery = async (req, res, next) => {
       },
     });
 
-    // Notify Customer
     await publishEvent("stream:notifications", {
       eventType: "ORDER_DELIVERED",
       userId: order.userId,

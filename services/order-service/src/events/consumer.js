@@ -2,38 +2,56 @@ import { consumeEvents, publishEvent } from "@shop/event-bus";
 import prisma from "../config/prisma.js";
 import { logger } from "@shop/utils";
 
+// Helper function to send dual notifications
+const sendOrderConfirmedNotifications = async (order, messageType) => {
+  // 1. Notify the Customer
+  await publishEvent("stream:notifications", {
+    eventType: "SYSTEM",
+    type: "SUCCESS",
+    userId: order.userId,
+    title: "🎉 Order Confirmed!",
+    message: `Your order #${order.orderId} has been ${messageType}. We are preparing it now!`,
+    link: `/profile/orders/${order.id}`,
+  });
+
+  // 2. Notify ALL Administrators (Using a special target flag handled by Notification Svc)
+  await publishEvent("stream:notifications", {
+    eventType: "SYSTEM",
+    type: "INFO",
+    target: "ADMINISTRATOR",
+    title: "🛍️ New Order Received",
+    message: `Order #${order.orderId} was just confirmed. Value: ${order.totalAmount} RUB`,
+    link: `/admin/orders/${order.id}`,
+  });
+};
+
 export const startOrderEventConsumers = async () => {
-  // 1. Listen to Product Service Events (Inventory Handlers)
+  // 1. Listen to Product Service Events
   consumeEvents(
     "stream:products",
     "order-service-group",
     async (payload, eventId) => {
       try {
         if (payload.eventType === "InventoryReserved") {
-          logger.info(
-            `[Event] Inventory reserved for Order: ${payload.orderId}. Checking payment type.`,
-          );
-
           const order = await prisma.order.findUnique({
             where: { id: payload.orderId },
           });
           if (!order) return;
 
-          // 🚨 PREPAID vs POSTPAID FLOW
+          // 🚨 POSTPAID FLOW: Confirm immediately upon inventory reservation
           if (order.paymentType === "POSTPAID") {
-            // Cash on Delivery: Confirm immediately
             await prisma.order.update({
               where: { id: payload.orderId },
               data: { status: "CONFIRMED" },
             });
 
-            await publishEvent("stream:notifications", {
-              eventType: "ORDER_PLACED",
-              userId: order.userId,
-              orderId: order.id,
-            });
+            // Dispatch Notifications
+            await sendOrderConfirmedNotifications(
+              order,
+              "placed and confirmed for Cash on Delivery",
+            );
           } else {
-            // Pre-Paid: Wait for Payment Service
+            // PREPAID FLOW: Wait for Payment
             await prisma.order.update({
               where: { id: payload.orderId },
               data: { status: "AWAITING_PAYMENT" },
@@ -81,7 +99,7 @@ export const startOrderEventConsumers = async () => {
     },
   );
 
-  // 2. Listen to Payment Service Events (Only relevant for PREPAID orders)
+  // 2. Listen to Payment Service Events (PREPAID ONLY)
   consumeEvents(
     "stream:payments",
     "order-service-group",
@@ -89,23 +107,18 @@ export const startOrderEventConsumers = async () => {
       try {
         const order = await prisma.order.findUnique({
           where: { id: payload.orderId },
-          include: { items: true },
         });
-
         if (!order) return;
 
-        // --- PAYMENT SUCCESS ---
         if (payload.eventType === "PaymentSucceeded") {
           logger.info(
-            `[Event] Payment success for Order: ${payload.orderId}. Confirming order.`,
+            `[Event] Payment success for Order: ${payload.orderId}. Confirming.`,
           );
 
-          // Inside consumer.js - PaymentSucceeded block
           await prisma.order.update({
             where: { id: payload.orderId },
             data: {
               status: "CONFIRMED",
-              // 🚨 Log the system automated action
               history: {
                 create: {
                   action: "PAYMENT_CONFIRMED",
@@ -114,17 +127,14 @@ export const startOrderEventConsumers = async () => {
                   userId: "SYSTEM_PAYMENT_SVC",
                   userRole: "SYSTEM",
                   notes:
-                    "Automated payment confirmation received from payment gateway.",
+                    "Automated payment confirmation received from Stripe gateway.",
                 },
               },
             },
           });
 
-          await publishEvent("stream:notifications", {
-            eventType: "ORDER_PLACED",
-            userId: order.userId,
-            orderId: order.id,
-          });
+          // Dispatch Notifications
+          await sendOrderConfirmedNotifications(order, "paid successfully");
         }
 
         // --- PAYMENT FAILED ---

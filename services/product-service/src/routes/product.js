@@ -11,7 +11,7 @@ import {
   updateProductStatus,
   deleteProduct,
 } from "../controllers/product.js";
-import { createUploader } from "@shop/utils";
+import { createUploader, requireInternalAuth } from "@shop/utils";
 import { requireAdmin } from "../middlewares/authHeaders.js";
 
 const router = express.Router();
@@ -19,9 +19,15 @@ const router = express.Router();
 const upload = createUploader(10);
 
 // ==========================================
+// 0. INTERNAL MICROSERVICE ROUTES
+// ==========================================
+// 🚨 NEW: Placed before protected routes so order-service can validate products safely
+router.get("/internal/:id", requireInternalAuth, getProductById);
+
+// ==========================================
 // 1. PUBLIC STOREFRONT ROUTES
 // ==========================================
-//  Fetch multiple tagged carousels at once for the Homepage
+// Fetch multiple tagged carousels at once for the Homepage
 router.get("/public/grouped", getGroupedProducts);
 // Advanced filtering, sorting, sentence search, and pagination
 router.get("/public/all", getPublicProducts);

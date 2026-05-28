@@ -1,4 +1,4 @@
-import { consumeEvents } from "@shop/event-bus";
+import { consumeEvents, publishEvent } from "@shop/event-bus";
 import { logger } from "@shop/utils";
 import prisma from "../config/prisma.js";
 import axios from "axios";
@@ -15,6 +15,15 @@ import { getOrderPlacedTemplate } from "../emails/templates/orderPlaced.js";
 import { generateInvoicePdfBuffer } from "../emails/pdfGenerator.js";
 
 /**
+ * Helper function to safely format short order IDs for display purposes
+ */
+const getDisplayOrderId = (orderId) => {
+  if (!orderId) return "";
+  // If it's a standard UUID, slice the first chunk. Otherwise, return as-is (e.g., 8-digit numeric)
+  return orderId.includes("-") ? orderId.split("-")[0].toUpperCase() : orderId;
+};
+
+/**
  * Helper function to map generic system events to UI notification text
  */
 const constructNotificationData = (payload) => {
@@ -23,25 +32,25 @@ const constructNotificationData = (payload) => {
       return {
         type: "ORDER",
         title: "Order Confirmed! 🎉",
-        message: `Your order #${payload.orderId?.split("-")[0].toUpperCase()} has been placed successfully.`,
+        message: `Your order #${getDisplayOrderId(payload.orderId)} has been placed successfully.`,
       };
     case "ORDER_SHIPPED":
       return {
         type: "ORDER",
         title: "Order Shipped 🚚",
-        message: `Your package for order #${payload.orderId?.split("-")[0].toUpperCase()} is on the way!`,
+        message: `Your package for order #${getDisplayOrderId(payload.orderId)} is on the way!`,
       };
     case "ORDER_DELIVERED":
       return {
         type: "ORDER",
         title: "Order Delivered ✅",
-        message: `Your order has been successfully delivered. Enjoy your purchase!`,
+        message: `Your order #${getDisplayOrderId(payload.orderId)} has been successfully delivered. Enjoy your purchase!`,
       };
     case "PAYMENT_FAILED":
       return {
         type: "ALERT",
         title: "Payment Failed ⚠️",
-        message: `There was an issue processing your payment for order #${payload.orderId?.split("-")[0].toUpperCase()}.`,
+        message: `There was an issue processing your payment for order #${getDisplayOrderId(payload.orderId)}.`,
       };
     case "NEW_CHAT_MESSAGE":
       return {
@@ -67,7 +76,7 @@ const constructNotificationData = (payload) => {
 
 /**
  * 🚨 BACKGROUND WORKER: Fetch Order + User data, generate PDF, and send Email
- * This runs completely independently of the WebSocket/Push logic.
+ * This runs completely independently of the WebSocket/Push logic so the event loop isn't blocked.
  */
 const processOrderEmail = async (userId, orderId) => {
   try {
@@ -95,7 +104,7 @@ const processOrderEmail = async (userId, orderId) => {
     const user = userRes.data.data;
     const order = orderRes.data.data;
 
-    if (!user.email) {
+    if (!user || !user.email) {
       logger.warn(
         `[Notification] Cannot send order email. User ${userId} has no email address.`,
       );
@@ -107,7 +116,7 @@ const processOrderEmail = async (userId, orderId) => {
     const pdfBuffer = await generateInvoicePdfBuffer(order, user);
 
     // 3. Construct Email Payload with Attachment
-    const shortOrderId = order.id.split("-")[0].toUpperCase();
+    const shortOrderId = getDisplayOrderId(order.orderId || order.id);
     const subject = `Order Confirmation #${shortOrderId}`;
     const attachments = [
       {
@@ -141,7 +150,7 @@ export const startNotificationConsumers = async () => {
     async (payload, eventId) => {
       try {
         if (payload.eventType === "USER_REGISTERED") {
-          const { userId, email, name } = payload.data;
+          const { userId, email, name } = payload.data || payload;
           logger.info(
             `[Notification] Processing welcome workflow for new user: ${email}`,
           );
@@ -186,13 +195,15 @@ export const startNotificationConsumers = async () => {
         // ==========================================
         // 🚨 TRIGGER ASYNC EMAIL & PDF GENERATOR
         // ==========================================
+        // Triggers on explicit placement or matching automated confirmation patterns
         if (
-          payload.eventType === "ORDER_PLACED" &&
+          (payload.eventType === "ORDER_PLACED" ||
+            (payload.eventType === "SYSTEM" &&
+              payload.title?.includes("Confirmed"))) &&
           payload.userId &&
           payload.orderId
         ) {
-          // Fire and forget: We do NOT 'await' this. Let it run in the background
-          // so the websocket and push notifications trigger instantly without waiting for PDF rendering.
+          // Fire and forget: Do not await so it runs in background
           processOrderEmail(payload.userId, payload.orderId).catch((err) =>
             logger.error(
               `[Background Task Error] Email generation failed: ${err.message}`,
@@ -201,9 +212,12 @@ export const startNotificationConsumers = async () => {
         }
 
         // ==========================================
-        // A. ADMIN BROADCAST ALERTS (e.g., OUT OF STOCK)
+        // A. ADMIN BROADCAST ALERTS (Supports Role + Targets flags)
         // ==========================================
-        if (payload.targetRole === "ADMINISTRATOR") {
+        if (
+          payload.targetRole === "ADMINISTRATOR" ||
+          payload.target === "ADMINS"
+        ) {
           logger.info(
             `[Notification] Processing Admin Broadcast: ${notifData.title}`,
           );
@@ -239,7 +253,7 @@ export const startNotificationConsumers = async () => {
               data: savedNotif,
             });
 
-            // 3. FCM
+            // 3. FCM Push
             const userPresence = await prisma.userPresence.findUnique({
               where: { userId: adminId },
             });
@@ -253,14 +267,14 @@ export const startNotificationConsumers = async () => {
                     notifData.message,
                     token,
                     null,
-                    { url: notifData.link },
+                    { url: notifData.link || "/admin" },
                   ),
                 );
                 await Promise.allSettled(pushPromises);
               }
             }
           }
-          return; // Done with broadcast
+          return; // Done with admin broadcast, exit early
         }
 
         // ==========================================
@@ -323,9 +337,10 @@ export const startNotificationConsumers = async () => {
           );
         }
       } catch (error) {
+        const safeErrorMessage =
+          error.response?.data?.message || error.message || "Unknown Error";
         logger.error(
-          `[Consumer Error] Failed processing notification event:`,
-          error,
+          `[Consumer Error] Failed processing notification event: ${safeErrorMessage}`,
         );
       }
     },

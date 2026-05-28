@@ -22,7 +22,7 @@ enum OrderStatus {
     @@schema("shop_order")
 }
 
-enum PaymentMode {
+enum PaymentMethod {
     CARD
     CASH
     UPI
@@ -40,12 +40,13 @@ enum PaymentType {
 }
 
 model Order {
-    id     String      @id @default(uuid())
-    userId String // Extracted from X-User-Id header
-    status OrderStatus @default(PENDING)
+    id      String      @id @default(uuid())
+    orderId String      @unique
+    userId  String // Extracted from X-User-Id header
+    status  OrderStatus @default(PENDING)
 
     // --- New Payment Fields ---
-    paymentMode      PaymentMode
+    paymentMethod    PaymentMethod
     paymentType      PaymentType
     deliveryAuthCode String // 4-digit code for courier authenticity
 

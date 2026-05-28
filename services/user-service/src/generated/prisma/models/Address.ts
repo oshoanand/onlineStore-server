@@ -184,7 +184,7 @@ export type AddressGroupByOutputType = {
   street: string
   city: string
   state: string
-  pincode: string
+  pincode: string | null
   isDefault: boolean
   createdAt: Date
   updatedAt: Date
@@ -218,7 +218,7 @@ export type AddressWhereInput = {
   street?: Prisma.StringFilter<"Address"> | string
   city?: Prisma.StringFilter<"Address"> | string
   state?: Prisma.StringFilter<"Address"> | string
-  pincode?: Prisma.StringFilter<"Address"> | string
+  pincode?: Prisma.StringNullableFilter<"Address"> | string | null
   isDefault?: Prisma.BoolFilter<"Address"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Address"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Address"> | Date | string
@@ -232,7 +232,7 @@ export type AddressOrderByWithRelationInput = {
   street?: Prisma.SortOrder
   city?: Prisma.SortOrder
   state?: Prisma.SortOrder
-  pincode?: Prisma.SortOrder
+  pincode?: Prisma.SortOrderInput | Prisma.SortOrder
   isDefault?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -249,7 +249,7 @@ export type AddressWhereUniqueInput = Prisma.AtLeast<{
   street?: Prisma.StringFilter<"Address"> | string
   city?: Prisma.StringFilter<"Address"> | string
   state?: Prisma.StringFilter<"Address"> | string
-  pincode?: Prisma.StringFilter<"Address"> | string
+  pincode?: Prisma.StringNullableFilter<"Address"> | string | null
   isDefault?: Prisma.BoolFilter<"Address"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Address"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Address"> | Date | string
@@ -263,7 +263,7 @@ export type AddressOrderByWithAggregationInput = {
   street?: Prisma.SortOrder
   city?: Prisma.SortOrder
   state?: Prisma.SortOrder
-  pincode?: Prisma.SortOrder
+  pincode?: Prisma.SortOrderInput | Prisma.SortOrder
   isDefault?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -282,7 +282,7 @@ export type AddressScalarWhereWithAggregatesInput = {
   street?: Prisma.StringWithAggregatesFilter<"Address"> | string
   city?: Prisma.StringWithAggregatesFilter<"Address"> | string
   state?: Prisma.StringWithAggregatesFilter<"Address"> | string
-  pincode?: Prisma.StringWithAggregatesFilter<"Address"> | string
+  pincode?: Prisma.StringNullableWithAggregatesFilter<"Address"> | string | null
   isDefault?: Prisma.BoolWithAggregatesFilter<"Address"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Address"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Address"> | Date | string
@@ -294,7 +294,7 @@ export type AddressCreateInput = {
   street: string
   city: string
   state: string
-  pincode: string
+  pincode?: string | null
   isDefault?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -308,7 +308,7 @@ export type AddressUncheckedCreateInput = {
   street: string
   city: string
   state: string
-  pincode: string
+  pincode?: string | null
   isDefault?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -320,7 +320,7 @@ export type AddressUpdateInput = {
   street?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.StringFieldUpdateOperationsInput | string
-  pincode?: Prisma.StringFieldUpdateOperationsInput | string
+  pincode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -334,7 +334,7 @@ export type AddressUncheckedUpdateInput = {
   street?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.StringFieldUpdateOperationsInput | string
-  pincode?: Prisma.StringFieldUpdateOperationsInput | string
+  pincode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -347,7 +347,7 @@ export type AddressCreateManyInput = {
   street: string
   city: string
   state: string
-  pincode: string
+  pincode?: string | null
   isDefault?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -359,7 +359,7 @@ export type AddressUpdateManyMutationInput = {
   street?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.StringFieldUpdateOperationsInput | string
-  pincode?: Prisma.StringFieldUpdateOperationsInput | string
+  pincode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -372,7 +372,7 @@ export type AddressUncheckedUpdateManyInput = {
   street?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.StringFieldUpdateOperationsInput | string
-  pincode?: Prisma.StringFieldUpdateOperationsInput | string
+  pincode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -479,7 +479,7 @@ export type AddressCreateWithoutCustomerProfileInput = {
   street: string
   city: string
   state: string
-  pincode: string
+  pincode?: string | null
   isDefault?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -491,7 +491,7 @@ export type AddressUncheckedCreateWithoutCustomerProfileInput = {
   street: string
   city: string
   state: string
-  pincode: string
+  pincode?: string | null
   isDefault?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -533,7 +533,7 @@ export type AddressScalarWhereInput = {
   street?: Prisma.StringFilter<"Address"> | string
   city?: Prisma.StringFilter<"Address"> | string
   state?: Prisma.StringFilter<"Address"> | string
-  pincode?: Prisma.StringFilter<"Address"> | string
+  pincode?: Prisma.StringNullableFilter<"Address"> | string | null
   isDefault?: Prisma.BoolFilter<"Address"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Address"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Address"> | Date | string
@@ -545,7 +545,7 @@ export type AddressCreateManyCustomerProfileInput = {
   street: string
   city: string
   state: string
-  pincode: string
+  pincode?: string | null
   isDefault?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -557,7 +557,7 @@ export type AddressUpdateWithoutCustomerProfileInput = {
   street?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.StringFieldUpdateOperationsInput | string
-  pincode?: Prisma.StringFieldUpdateOperationsInput | string
+  pincode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -569,7 +569,7 @@ export type AddressUncheckedUpdateWithoutCustomerProfileInput = {
   street?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.StringFieldUpdateOperationsInput | string
-  pincode?: Prisma.StringFieldUpdateOperationsInput | string
+  pincode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -581,7 +581,7 @@ export type AddressUncheckedUpdateManyWithoutCustomerProfileInput = {
   street?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   state?: Prisma.StringFieldUpdateOperationsInput | string
-  pincode?: Prisma.StringFieldUpdateOperationsInput | string
+  pincode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -667,7 +667,7 @@ export type $AddressPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     street: string
     city: string
     state: string
-    pincode: string
+    pincode: string | null
     isDefault: boolean
     createdAt: Date
     updatedAt: Date

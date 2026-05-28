@@ -70,6 +70,26 @@ model User {
 }
 
 // ==========================================
+// ADMINISTRATOR DOMAIN
+// ==========================================
+model AdministratorProfile {
+    id     String @id @default(uuid())
+    userId String @unique
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    fullName String
+
+    profilePhoto String?
+    department   String? // e.g., "Fulfillment", "Support", "SuperAdmin"
+    employeeId   String? @unique
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@schema("shop_user")
+}
+
+// ==========================================
 // CUSTOMER DOMAIN
 // ==========================================
 model CustomerProfile {
@@ -106,7 +126,7 @@ model Address {
     street    String
     city      String
     state     String
-    pincode   String
+    pincode   String?
     isDefault Boolean @default(false)
 
     createdAt DateTime @default(now())
@@ -135,26 +155,6 @@ model BankCard {
     createdAt DateTime @default(now())
 
     @@index([customerProfileId])
-    @@schema("shop_user")
-}
-
-// ==========================================
-// ADMINISTRATOR DOMAIN
-// ==========================================
-model AdministratorProfile {
-    id     String @id @default(uuid())
-    userId String @unique
-    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-    fullName String
-
-    profilePhoto String?
-    department   String? // e.g., "Fulfillment", "Support", "SuperAdmin"
-    employeeId   String? @unique
-
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
     @@schema("shop_user")
 }
 

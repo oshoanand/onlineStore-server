@@ -31,19 +31,19 @@ app.use((req, res) => {
   });
 });
 
-// 5. Global Error Handler
-const errorHandler = (err, req, res, next) => {
-  logger.error(err.message, { stack: err.stack });
+// // 5. Global Error Handler
+// const errorHandler = (err, req, res, next) => {
+//   logger.error(err.message, { stack: err.stack });
 
-  // Some libraries use err.status, others use err.statusCode. Handle both!
-  const statusCode = err.statusCode || err.status || 500;
+//   // Some libraries use err.status, others use err.statusCode. Handle both!
+//   const statusCode = err.statusCode || err.status || 500;
 
-  res.status(statusCode).json({
-    status: "error",
-    message: statusCode === 500 ? "Internal Server Error" : err.message,
-  });
-};
+//   res.status(statusCode).json({
+//     status: "error",
+//     message: statusCode === 500 ? "Internal Server Error" : err.message,
+//   });
+// };
 
-app.use(errorHandler);
+// app.use(errorHandler);
 
 export default app;

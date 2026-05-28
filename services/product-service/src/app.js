@@ -31,7 +31,9 @@ app.use("/public/categories", categoryRoutes);
 // 2. Catches: /api/products/categories/admin/all (From Admin Panel)
 app.use("/categories", categoryRoutes);
 
+app.use("/public/shipping", shippingRoutes); // Catches: /api/products/public/shipping/calculate
 app.use("/shipping", shippingRoutes);
+
 app.use("/", productRoutes);
 
 // 4. Unmatched Route Handler (404)

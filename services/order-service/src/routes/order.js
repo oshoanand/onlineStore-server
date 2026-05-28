@@ -6,10 +6,10 @@ import {
   getAllOrdersAdmin,
   updateOrderStatus,
   verifyCourierDelivery,
-  getInternalOrder, // 🚨 NEW: Added for service-to-service communication
+  getInternalOrder,
 } from "../controllers/order.js";
 import { requireAuth, requireAdmin } from "../middlewares/authHeaders.js";
-import { requireInternalAuth } from "@shop/utils"; // 🚨 NEW: Shared internal middleware
+import { requireInternalAuth } from "@shop/utils";
 
 const router = express.Router();
 
@@ -26,7 +26,7 @@ router.get("/internal/:id", requireInternalAuth, getInternalOrder);
 // Apply the authentication middleware only to the routes below this line.
 router.use(requireAuth);
 
-router.post("/", createOrder);
+router.post("/create", createOrder);
 router.get("/", getUserOrders);
 
 // ==========================================

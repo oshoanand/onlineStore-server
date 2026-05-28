@@ -17,6 +17,7 @@ model Notification {
     userId    String
     title     String
     message   String
+    link      String?
     type      String // e.g., 'ORDER_UPDATE', 'PROMOTION', 'SECURITY'
     isRead    Boolean  @default(false)
     createdAt DateTime @default(now())

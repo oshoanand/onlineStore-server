@@ -24,19 +24,19 @@ app.use("/", routes);
 
 // 4. Global Error Handler
 // Moved to the bottom to ensure it catches errors from all middleware/routes above it
-const errorHandler = (err, req, res, next) => {
-  logger.error(err.message, { stack: err.stack });
+// const errorHandler = (err, req, res, next) => {
+//   logger.error(err.message, { stack: err.stack });
 
-  // Support both err.statusCode and err.status (different npm packages use different keys)
-  const statusCode = err.statusCode || err.status || 500;
+//   // Support both err.statusCode and err.status (different npm packages use different keys)
+//   const statusCode = err.statusCode || err.status || 500;
 
-  // Hide internal server crash details from the frontend for security
-  res.status(statusCode).json({
-    status: "error",
-    message: statusCode === 500 ? "Internal Server Error" : err.message,
-  });
-};
+//   // Hide internal server crash details from the frontend for security
+//   res.status(statusCode).json({
+//     status: "error",
+//     message: statusCode === 500 ? "Internal Server Error" : err.message,
+//   });
+// };
 
-app.use(errorHandler);
+// app.use(errorHandler);
 
 export default app;

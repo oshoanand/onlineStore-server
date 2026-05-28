@@ -3,6 +3,7 @@ import { UnauthorizedError, createUploader } from "@shop/utils";
 import {
   getMyNotifications,
   markAsRead,
+  markAllAsRead,
   getChatHistory,
   uploadChatAttachment,
 } from "../controllers/notification.js";
@@ -11,6 +12,13 @@ import {
 // MIDDLEWARE: Authentication via API Gateway
 // ==========================================
 const requireAuth = (req, res, next) => {
+  // 🚨 CRITICAL FIX: Bypass Express REST Auth for Socket.IO HTTP polling requests.
+  // Socket.IO authenticates itself via io.use() in websockets/index.js using the query token.
+  // If we don't bypass this, Express blocks the initial connection handshake.
+  if (req.originalUrl && req.originalUrl.includes("/socket.io")) {
+    return next();
+  }
+
   const userId = req.headers["x-user-id"];
 
   if (!userId) {
@@ -33,7 +41,9 @@ router.use(requireAuth);
 // ==========================================
 // 1. STANDARD NOTIFICATIONS
 // ==========================================
+
 router.get("/", getMyNotifications);
+router.patch("/read-all", markAllAsRead);
 router.patch("/:id/read", markAsRead);
 
 // ==========================================

@@ -299,9 +299,7 @@ export const getGroupedProducts = async (req, res, next) => {
 // ==========================================
 // ADMIN: CREATE PRODUCT
 // ==========================================
-// ==========================================
-// ADMIN: CREATE PRODUCT
-// ==========================================
+
 export const createProduct = async (req, res, next) => {
   try {
     const {

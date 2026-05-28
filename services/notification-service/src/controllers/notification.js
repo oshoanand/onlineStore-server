@@ -41,6 +41,24 @@ export const markAsRead = async (req, res, next) => {
   }
 };
 
+export const markAllAsRead = async (req, res, next) => {
+  try {
+    // Update all unread notifications for this specific user
+    await prisma.notification.updateMany({
+      where: {
+        userId: req.user.id,
+        isRead: false,
+      },
+      data: { isRead: true },
+    });
+
+    res
+      .status(200)
+      .json({ success: true, message: "All notifications marked as read" });
+  } catch (error) {
+    next(error);
+  }
+};
 // ==========================================
 // 2. CHAT FUNCTIONALITY
 // ==========================================

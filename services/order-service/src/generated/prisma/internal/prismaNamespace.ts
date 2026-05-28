@@ -669,9 +669,10 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const OrderScalarFieldEnum = {
   id: 'id',
+  orderId: 'orderId',
   userId: 'userId',
   status: 'status',
-  paymentMode: 'paymentMode',
+  paymentMethod: 'paymentMethod',
   paymentType: 'paymentType',
   deliveryAuthCode: 'deliveryAuthCode',
   totalAmount: 'totalAmount',
@@ -787,16 +788,16 @@ export type ListEnumOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$
 
 
 /**
- * Reference to a field of type 'PaymentMode'
+ * Reference to a field of type 'PaymentMethod'
  */
-export type EnumPaymentModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentMode'>
+export type EnumPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentMethod'>
     
 
 
 /**
- * Reference to a field of type 'PaymentMode[]'
+ * Reference to a field of type 'PaymentMethod[]'
  */
-export type ListEnumPaymentModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentMode[]'>
+export type ListEnumPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentMethod[]'>
     
 
 

@@ -14,7 +14,7 @@ const router = express.Router();
 // 1. PUBLIC ROUTES (Used by Checkout / Cart)
 // ==========================================
 // POST because we are sending a payload (city and cart total)
-router.post("/public/calculate", calculateShippingCost);
+router.post("/calculate", calculateShippingCost);
 
 // ==========================================
 // 2. ADMIN PROTECTED ROUTES

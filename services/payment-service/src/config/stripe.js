@@ -7,5 +7,5 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2023-10-16", // Always lock your API version
+  apiVersion: "2026-04-22.dahlia", // Always lock your API version
 });

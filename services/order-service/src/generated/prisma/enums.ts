@@ -23,7 +23,7 @@ export const OrderStatus = {
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
 
 
-export const PaymentMode = {
+export const PaymentMethod = {
   CARD: 'CARD',
   CASH: 'CASH',
   UPI: 'UPI',
@@ -31,7 +31,7 @@ export const PaymentMode = {
   NET_BANKING: 'NET_BANKING'
 } as const
 
-export type PaymentMode = (typeof PaymentMode)[keyof typeof PaymentMode]
+export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod]
 
 
 export const PaymentType = {

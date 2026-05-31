@@ -64,6 +64,11 @@ export type ProductMinAggregateOutputType = {
   metaDescription: string | null
   keywords: string | null
   thumbImage: string | null
+  avitoLink: string | null
+  yandexmarketLink: string | null
+  ozonLink: string | null
+  wildberriesLink: string | null
+  amazonLink: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -90,6 +95,11 @@ export type ProductMaxAggregateOutputType = {
   metaDescription: string | null
   keywords: string | null
   thumbImage: string | null
+  avitoLink: string | null
+  yandexmarketLink: string | null
+  ozonLink: string | null
+  wildberriesLink: string | null
+  amazonLink: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -119,6 +129,11 @@ export type ProductCountAggregateOutputType = {
   keywords: number
   thumbImage: number
   imageArray: number
+  avitoLink: number
+  yandexmarketLink: number
+  ozonLink: number
+  wildberriesLink: number
+  amazonLink: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -163,6 +178,11 @@ export type ProductMinAggregateInputType = {
   metaDescription?: true
   keywords?: true
   thumbImage?: true
+  avitoLink?: true
+  yandexmarketLink?: true
+  ozonLink?: true
+  wildberriesLink?: true
+  amazonLink?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -189,6 +209,11 @@ export type ProductMaxAggregateInputType = {
   metaDescription?: true
   keywords?: true
   thumbImage?: true
+  avitoLink?: true
+  yandexmarketLink?: true
+  ozonLink?: true
+  wildberriesLink?: true
+  amazonLink?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -218,6 +243,11 @@ export type ProductCountAggregateInputType = {
   keywords?: true
   thumbImage?: true
   imageArray?: true
+  avitoLink?: true
+  yandexmarketLink?: true
+  ozonLink?: true
+  wildberriesLink?: true
+  amazonLink?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -334,6 +364,11 @@ export type ProductGroupByOutputType = {
   keywords: string | null
   thumbImage: string | null
   imageArray: string[]
+  avitoLink: string | null
+  yandexmarketLink: string | null
+  ozonLink: string | null
+  wildberriesLink: string | null
+  amazonLink: string | null
   createdAt: Date
   updatedAt: Date
   _count: ProductCountAggregateOutputType | null
@@ -386,9 +421,15 @@ export type ProductWhereInput = {
   keywords?: Prisma.StringNullableFilter<"Product"> | string | null
   thumbImage?: Prisma.StringNullableFilter<"Product"> | string | null
   imageArray?: Prisma.StringNullableListFilter<"Product">
+  avitoLink?: Prisma.StringNullableFilter<"Product"> | string | null
+  yandexmarketLink?: Prisma.StringNullableFilter<"Product"> | string | null
+  ozonLink?: Prisma.StringNullableFilter<"Product"> | string | null
+  wildberriesLink?: Prisma.StringNullableFilter<"Product"> | string | null
+  amazonLink?: Prisma.StringNullableFilter<"Product"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   categories?: Prisma.CategoryListRelationFilter
+  marketplaceClicks?: Prisma.MarketplaceClickListRelationFilter
 }
 
 export type ProductOrderByWithRelationInput = {
@@ -416,9 +457,15 @@ export type ProductOrderByWithRelationInput = {
   keywords?: Prisma.SortOrderInput | Prisma.SortOrder
   thumbImage?: Prisma.SortOrderInput | Prisma.SortOrder
   imageArray?: Prisma.SortOrder
+  avitoLink?: Prisma.SortOrderInput | Prisma.SortOrder
+  yandexmarketLink?: Prisma.SortOrderInput | Prisma.SortOrder
+  ozonLink?: Prisma.SortOrderInput | Prisma.SortOrder
+  wildberriesLink?: Prisma.SortOrderInput | Prisma.SortOrder
+  amazonLink?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   categories?: Prisma.CategoryOrderByRelationAggregateInput
+  marketplaceClicks?: Prisma.MarketplaceClickOrderByRelationAggregateInput
 }
 
 export type ProductWhereUniqueInput = Prisma.AtLeast<{
@@ -449,9 +496,15 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   keywords?: Prisma.StringNullableFilter<"Product"> | string | null
   thumbImage?: Prisma.StringNullableFilter<"Product"> | string | null
   imageArray?: Prisma.StringNullableListFilter<"Product">
+  avitoLink?: Prisma.StringNullableFilter<"Product"> | string | null
+  yandexmarketLink?: Prisma.StringNullableFilter<"Product"> | string | null
+  ozonLink?: Prisma.StringNullableFilter<"Product"> | string | null
+  wildberriesLink?: Prisma.StringNullableFilter<"Product"> | string | null
+  amazonLink?: Prisma.StringNullableFilter<"Product"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   categories?: Prisma.CategoryListRelationFilter
+  marketplaceClicks?: Prisma.MarketplaceClickListRelationFilter
 }, "id" | "slug" | "sku">
 
 export type ProductOrderByWithAggregationInput = {
@@ -479,6 +532,11 @@ export type ProductOrderByWithAggregationInput = {
   keywords?: Prisma.SortOrderInput | Prisma.SortOrder
   thumbImage?: Prisma.SortOrderInput | Prisma.SortOrder
   imageArray?: Prisma.SortOrder
+  avitoLink?: Prisma.SortOrderInput | Prisma.SortOrder
+  yandexmarketLink?: Prisma.SortOrderInput | Prisma.SortOrder
+  ozonLink?: Prisma.SortOrderInput | Prisma.SortOrder
+  wildberriesLink?: Prisma.SortOrderInput | Prisma.SortOrder
+  amazonLink?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ProductCountOrderByAggregateInput
@@ -516,6 +574,11 @@ export type ProductScalarWhereWithAggregatesInput = {
   keywords?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
   thumbImage?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
   imageArray?: Prisma.StringNullableListFilter<"Product">
+  avitoLink?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
+  yandexmarketLink?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
+  ozonLink?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
+  wildberriesLink?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
+  amazonLink?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Product"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Product"> | Date | string
 }
@@ -545,9 +608,15 @@ export type ProductCreateInput = {
   keywords?: string | null
   thumbImage?: string | null
   imageArray?: Prisma.ProductCreateimageArrayInput | string[]
+  avitoLink?: string | null
+  yandexmarketLink?: string | null
+  ozonLink?: string | null
+  wildberriesLink?: string | null
+  amazonLink?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   categories?: Prisma.CategoryCreateNestedManyWithoutProductsInput
+  marketplaceClicks?: Prisma.MarketplaceClickCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateInput = {
@@ -575,9 +644,15 @@ export type ProductUncheckedCreateInput = {
   keywords?: string | null
   thumbImage?: string | null
   imageArray?: Prisma.ProductCreateimageArrayInput | string[]
+  avitoLink?: string | null
+  yandexmarketLink?: string | null
+  ozonLink?: string | null
+  wildberriesLink?: string | null
+  amazonLink?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutProductsInput
+  marketplaceClicks?: Prisma.MarketplaceClickUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductUpdateInput = {
@@ -605,9 +680,15 @@ export type ProductUpdateInput = {
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageArray?: Prisma.ProductUpdateimageArrayInput | string[]
+  avitoLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  yandexmarketLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ozonLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  wildberriesLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  amazonLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   categories?: Prisma.CategoryUpdateManyWithoutProductsNestedInput
+  marketplaceClicks?: Prisma.MarketplaceClickUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateInput = {
@@ -635,9 +716,15 @@ export type ProductUncheckedUpdateInput = {
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageArray?: Prisma.ProductUpdateimageArrayInput | string[]
+  avitoLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  yandexmarketLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ozonLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  wildberriesLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  amazonLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutProductsNestedInput
+  marketplaceClicks?: Prisma.MarketplaceClickUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateManyInput = {
@@ -665,6 +752,11 @@ export type ProductCreateManyInput = {
   keywords?: string | null
   thumbImage?: string | null
   imageArray?: Prisma.ProductCreateimageArrayInput | string[]
+  avitoLink?: string | null
+  yandexmarketLink?: string | null
+  ozonLink?: string | null
+  wildberriesLink?: string | null
+  amazonLink?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -694,6 +786,11 @@ export type ProductUpdateManyMutationInput = {
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageArray?: Prisma.ProductUpdateimageArrayInput | string[]
+  avitoLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  yandexmarketLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ozonLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  wildberriesLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  amazonLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -723,6 +820,11 @@ export type ProductUncheckedUpdateManyInput = {
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageArray?: Prisma.ProductUpdateimageArrayInput | string[]
+  avitoLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  yandexmarketLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ozonLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  wildberriesLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  amazonLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -760,6 +862,11 @@ export type ProductCountOrderByAggregateInput = {
   keywords?: Prisma.SortOrder
   thumbImage?: Prisma.SortOrder
   imageArray?: Prisma.SortOrder
+  avitoLink?: Prisma.SortOrder
+  yandexmarketLink?: Prisma.SortOrder
+  ozonLink?: Prisma.SortOrder
+  wildberriesLink?: Prisma.SortOrder
+  amazonLink?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -794,6 +901,11 @@ export type ProductMaxOrderByAggregateInput = {
   metaDescription?: Prisma.SortOrder
   keywords?: Prisma.SortOrder
   thumbImage?: Prisma.SortOrder
+  avitoLink?: Prisma.SortOrder
+  yandexmarketLink?: Prisma.SortOrder
+  ozonLink?: Prisma.SortOrder
+  wildberriesLink?: Prisma.SortOrder
+  amazonLink?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -820,6 +932,11 @@ export type ProductMinOrderByAggregateInput = {
   metaDescription?: Prisma.SortOrder
   keywords?: Prisma.SortOrder
   thumbImage?: Prisma.SortOrder
+  avitoLink?: Prisma.SortOrder
+  yandexmarketLink?: Prisma.SortOrder
+  ozonLink?: Prisma.SortOrder
+  wildberriesLink?: Prisma.SortOrder
+  amazonLink?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -830,6 +947,11 @@ export type ProductSumOrderByAggregateInput = {
   inStock?: Prisma.SortOrder
   averageRating?: Prisma.SortOrder
   reviewCount?: Prisma.SortOrder
+}
+
+export type ProductScalarRelationFilter = {
+  is?: Prisma.ProductWhereInput
+  isNot?: Prisma.ProductWhereInput
 }
 
 export type ProductListRelationFilter = {
@@ -912,6 +1034,20 @@ export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
+export type ProductCreateNestedOneWithoutMarketplaceClicksInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutMarketplaceClicksInput, Prisma.ProductUncheckedCreateWithoutMarketplaceClicksInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutMarketplaceClicksInput
+  connect?: Prisma.ProductWhereUniqueInput
+}
+
+export type ProductUpdateOneRequiredWithoutMarketplaceClicksNestedInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutMarketplaceClicksInput, Prisma.ProductUncheckedCreateWithoutMarketplaceClicksInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutMarketplaceClicksInput
+  upsert?: Prisma.ProductUpsertWithoutMarketplaceClicksInput
+  connect?: Prisma.ProductWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProductUpdateToOneWithWhereWithoutMarketplaceClicksInput, Prisma.ProductUpdateWithoutMarketplaceClicksInput>, Prisma.ProductUncheckedUpdateWithoutMarketplaceClicksInput>
+}
+
 export type ProductCreateNestedManyWithoutCategoriesInput = {
   create?: Prisma.XOR<Prisma.ProductCreateWithoutCategoriesInput, Prisma.ProductUncheckedCreateWithoutCategoriesInput> | Prisma.ProductCreateWithoutCategoriesInput[] | Prisma.ProductUncheckedCreateWithoutCategoriesInput[]
   connectOrCreate?: Prisma.ProductCreateOrConnectWithoutCategoriesInput | Prisma.ProductCreateOrConnectWithoutCategoriesInput[]
@@ -950,6 +1086,162 @@ export type ProductUncheckedUpdateManyWithoutCategoriesNestedInput = {
   deleteMany?: Prisma.ProductScalarWhereInput | Prisma.ProductScalarWhereInput[]
 }
 
+export type ProductCreateWithoutMarketplaceClicksInput = {
+  id?: string
+  name: string
+  slug: string
+  sku?: string | null
+  description: string
+  detailedDescription?: string | null
+  brand?: string | null
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountedPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  inStock?: number
+  status?: $Enums.ProductStatus
+  isPublished?: boolean
+  weight?: string | null
+  dimensions?: string | null
+  color?: string | null
+  variants?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tags?: Prisma.ProductCreatetagsInput | string[]
+  averageRating?: number
+  reviewCount?: number
+  metaTitle?: string | null
+  metaDescription?: string | null
+  keywords?: string | null
+  thumbImage?: string | null
+  imageArray?: Prisma.ProductCreateimageArrayInput | string[]
+  avitoLink?: string | null
+  yandexmarketLink?: string | null
+  ozonLink?: string | null
+  wildberriesLink?: string | null
+  amazonLink?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  categories?: Prisma.CategoryCreateNestedManyWithoutProductsInput
+}
+
+export type ProductUncheckedCreateWithoutMarketplaceClicksInput = {
+  id?: string
+  name: string
+  slug: string
+  sku?: string | null
+  description: string
+  detailedDescription?: string | null
+  brand?: string | null
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountedPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  inStock?: number
+  status?: $Enums.ProductStatus
+  isPublished?: boolean
+  weight?: string | null
+  dimensions?: string | null
+  color?: string | null
+  variants?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tags?: Prisma.ProductCreatetagsInput | string[]
+  averageRating?: number
+  reviewCount?: number
+  metaTitle?: string | null
+  metaDescription?: string | null
+  keywords?: string | null
+  thumbImage?: string | null
+  imageArray?: Prisma.ProductCreateimageArrayInput | string[]
+  avitoLink?: string | null
+  yandexmarketLink?: string | null
+  ozonLink?: string | null
+  wildberriesLink?: string | null
+  amazonLink?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutProductsInput
+}
+
+export type ProductCreateOrConnectWithoutMarketplaceClicksInput = {
+  where: Prisma.ProductWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProductCreateWithoutMarketplaceClicksInput, Prisma.ProductUncheckedCreateWithoutMarketplaceClicksInput>
+}
+
+export type ProductUpsertWithoutMarketplaceClicksInput = {
+  update: Prisma.XOR<Prisma.ProductUpdateWithoutMarketplaceClicksInput, Prisma.ProductUncheckedUpdateWithoutMarketplaceClicksInput>
+  create: Prisma.XOR<Prisma.ProductCreateWithoutMarketplaceClicksInput, Prisma.ProductUncheckedCreateWithoutMarketplaceClicksInput>
+  where?: Prisma.ProductWhereInput
+}
+
+export type ProductUpdateToOneWithWhereWithoutMarketplaceClicksInput = {
+  where?: Prisma.ProductWhereInput
+  data: Prisma.XOR<Prisma.ProductUpdateWithoutMarketplaceClicksInput, Prisma.ProductUncheckedUpdateWithoutMarketplaceClicksInput>
+}
+
+export type ProductUpdateWithoutMarketplaceClicksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  detailedDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  brand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountedPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  inStock?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
+  isPublished?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  weight?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dimensions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  variants?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tags?: Prisma.ProductUpdatetagsInput | string[]
+  averageRating?: Prisma.FloatFieldUpdateOperationsInput | number
+  reviewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageArray?: Prisma.ProductUpdateimageArrayInput | string[]
+  avitoLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  yandexmarketLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ozonLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  wildberriesLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  amazonLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  categories?: Prisma.CategoryUpdateManyWithoutProductsNestedInput
+}
+
+export type ProductUncheckedUpdateWithoutMarketplaceClicksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  sku?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  detailedDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  brand?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountedPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  inStock?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
+  isPublished?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  weight?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dimensions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  variants?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tags?: Prisma.ProductUpdatetagsInput | string[]
+  averageRating?: Prisma.FloatFieldUpdateOperationsInput | number
+  reviewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  metaTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metaDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageArray?: Prisma.ProductUpdateimageArrayInput | string[]
+  avitoLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  yandexmarketLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ozonLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  wildberriesLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  amazonLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutProductsNestedInput
+}
+
 export type ProductCreateWithoutCategoriesInput = {
   id?: string
   name: string
@@ -975,8 +1267,14 @@ export type ProductCreateWithoutCategoriesInput = {
   keywords?: string | null
   thumbImage?: string | null
   imageArray?: Prisma.ProductCreateimageArrayInput | string[]
+  avitoLink?: string | null
+  yandexmarketLink?: string | null
+  ozonLink?: string | null
+  wildberriesLink?: string | null
+  amazonLink?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  marketplaceClicks?: Prisma.MarketplaceClickCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutCategoriesInput = {
@@ -1004,8 +1302,14 @@ export type ProductUncheckedCreateWithoutCategoriesInput = {
   keywords?: string | null
   thumbImage?: string | null
   imageArray?: Prisma.ProductCreateimageArrayInput | string[]
+  avitoLink?: string | null
+  yandexmarketLink?: string | null
+  ozonLink?: string | null
+  wildberriesLink?: string | null
+  amazonLink?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  marketplaceClicks?: Prisma.MarketplaceClickUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutCategoriesInput = {
@@ -1057,6 +1361,11 @@ export type ProductScalarWhereInput = {
   keywords?: Prisma.StringNullableFilter<"Product"> | string | null
   thumbImage?: Prisma.StringNullableFilter<"Product"> | string | null
   imageArray?: Prisma.StringNullableListFilter<"Product">
+  avitoLink?: Prisma.StringNullableFilter<"Product"> | string | null
+  yandexmarketLink?: Prisma.StringNullableFilter<"Product"> | string | null
+  ozonLink?: Prisma.StringNullableFilter<"Product"> | string | null
+  wildberriesLink?: Prisma.StringNullableFilter<"Product"> | string | null
+  amazonLink?: Prisma.StringNullableFilter<"Product"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Product"> | Date | string
 }
@@ -1086,8 +1395,14 @@ export type ProductUpdateWithoutCategoriesInput = {
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageArray?: Prisma.ProductUpdateimageArrayInput | string[]
+  avitoLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  yandexmarketLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ozonLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  wildberriesLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  amazonLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  marketplaceClicks?: Prisma.MarketplaceClickUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutCategoriesInput = {
@@ -1115,8 +1430,14 @@ export type ProductUncheckedUpdateWithoutCategoriesInput = {
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageArray?: Prisma.ProductUpdateimageArrayInput | string[]
+  avitoLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  yandexmarketLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ozonLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  wildberriesLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  amazonLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  marketplaceClicks?: Prisma.MarketplaceClickUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateManyWithoutCategoriesInput = {
@@ -1144,6 +1465,11 @@ export type ProductUncheckedUpdateManyWithoutCategoriesInput = {
   keywords?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   thumbImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageArray?: Prisma.ProductUpdateimageArrayInput | string[]
+  avitoLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  yandexmarketLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ozonLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  wildberriesLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  amazonLink?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1155,10 +1481,12 @@ export type ProductUncheckedUpdateManyWithoutCategoriesInput = {
 
 export type ProductCountOutputType = {
   categories: number
+  marketplaceClicks: number
 }
 
 export type ProductCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   categories?: boolean | ProductCountOutputTypeCountCategoriesArgs
+  marketplaceClicks?: boolean | ProductCountOutputTypeCountMarketplaceClicksArgs
 }
 
 /**
@@ -1176,6 +1504,13 @@ export type ProductCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Exte
  */
 export type ProductCountOutputTypeCountCategoriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.CategoryWhereInput
+}
+
+/**
+ * ProductCountOutputType without action
+ */
+export type ProductCountOutputTypeCountMarketplaceClicksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MarketplaceClickWhereInput
 }
 
 
@@ -1204,9 +1539,15 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   keywords?: boolean
   thumbImage?: boolean
   imageArray?: boolean
+  avitoLink?: boolean
+  yandexmarketLink?: boolean
+  ozonLink?: boolean
+  wildberriesLink?: boolean
+  amazonLink?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   categories?: boolean | Prisma.Product$categoriesArgs<ExtArgs>
+  marketplaceClicks?: boolean | Prisma.Product$marketplaceClicksArgs<ExtArgs>
   _count?: boolean | Prisma.ProductCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["product"]>
 
@@ -1235,6 +1576,11 @@ export type ProductSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   keywords?: boolean
   thumbImage?: boolean
   imageArray?: boolean
+  avitoLink?: boolean
+  yandexmarketLink?: boolean
+  ozonLink?: boolean
+  wildberriesLink?: boolean
+  amazonLink?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["product"]>
@@ -1264,6 +1610,11 @@ export type ProductSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   keywords?: boolean
   thumbImage?: boolean
   imageArray?: boolean
+  avitoLink?: boolean
+  yandexmarketLink?: boolean
+  ozonLink?: boolean
+  wildberriesLink?: boolean
+  amazonLink?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["product"]>
@@ -1293,13 +1644,19 @@ export type ProductSelectScalar = {
   keywords?: boolean
   thumbImage?: boolean
   imageArray?: boolean
+  avitoLink?: boolean
+  yandexmarketLink?: boolean
+  ozonLink?: boolean
+  wildberriesLink?: boolean
+  amazonLink?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "sku" | "description" | "detailedDescription" | "brand" | "price" | "discountedPrice" | "inStock" | "status" | "isPublished" | "weight" | "dimensions" | "color" | "variants" | "tags" | "averageRating" | "reviewCount" | "metaTitle" | "metaDescription" | "keywords" | "thumbImage" | "imageArray" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
+export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "sku" | "description" | "detailedDescription" | "brand" | "price" | "discountedPrice" | "inStock" | "status" | "isPublished" | "weight" | "dimensions" | "color" | "variants" | "tags" | "averageRating" | "reviewCount" | "metaTitle" | "metaDescription" | "keywords" | "thumbImage" | "imageArray" | "avitoLink" | "yandexmarketLink" | "ozonLink" | "wildberriesLink" | "amazonLink" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
 export type ProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   categories?: boolean | Prisma.Product$categoriesArgs<ExtArgs>
+  marketplaceClicks?: boolean | Prisma.Product$marketplaceClicksArgs<ExtArgs>
   _count?: boolean | Prisma.ProductCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ProductIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1309,6 +1666,7 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   name: "Product"
   objects: {
     categories: Prisma.$CategoryPayload<ExtArgs>[]
+    marketplaceClicks: Prisma.$MarketplaceClickPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1335,6 +1693,11 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     keywords: string | null
     thumbImage: string | null
     imageArray: string[]
+    avitoLink: string | null
+    yandexmarketLink: string | null
+    ozonLink: string | null
+    wildberriesLink: string | null
+    amazonLink: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["product"]>
@@ -1732,6 +2095,7 @@ readonly fields: ProductFieldRefs;
 export interface Prisma__ProductClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   categories<T extends Prisma.Product$categoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$categoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  marketplaceClicks<T extends Prisma.Product$marketplaceClicksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$marketplaceClicksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MarketplaceClickPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1785,6 +2149,11 @@ export interface ProductFieldRefs {
   readonly keywords: Prisma.FieldRef<"Product", 'String'>
   readonly thumbImage: Prisma.FieldRef<"Product", 'String'>
   readonly imageArray: Prisma.FieldRef<"Product", 'String[]'>
+  readonly avitoLink: Prisma.FieldRef<"Product", 'String'>
+  readonly yandexmarketLink: Prisma.FieldRef<"Product", 'String'>
+  readonly ozonLink: Prisma.FieldRef<"Product", 'String'>
+  readonly wildberriesLink: Prisma.FieldRef<"Product", 'String'>
+  readonly amazonLink: Prisma.FieldRef<"Product", 'String'>
   readonly createdAt: Prisma.FieldRef<"Product", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Product", 'DateTime'>
 }
@@ -2201,6 +2570,30 @@ export type Product$categoriesArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.CategoryScalarFieldEnum | Prisma.CategoryScalarFieldEnum[]
+}
+
+/**
+ * Product.marketplaceClicks
+ */
+export type Product$marketplaceClicksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MarketplaceClick
+   */
+  select?: Prisma.MarketplaceClickSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MarketplaceClick
+   */
+  omit?: Prisma.MarketplaceClickOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MarketplaceClickInclude<ExtArgs> | null
+  where?: Prisma.MarketplaceClickWhereInput
+  orderBy?: Prisma.MarketplaceClickOrderByWithRelationInput | Prisma.MarketplaceClickOrderByWithRelationInput[]
+  cursor?: Prisma.MarketplaceClickWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MarketplaceClickScalarFieldEnum | Prisma.MarketplaceClickScalarFieldEnum[]
 }
 
 /**

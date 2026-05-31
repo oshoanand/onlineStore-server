@@ -6,6 +6,10 @@ import {
   markAllAsRead,
   getChatHistory,
   uploadChatAttachment,
+  createSupportTicket,
+  getChatSessions,
+  getUnreadChatCount,
+  initChatSession,
 } from "../controllers/notification.js";
 
 // ==========================================
@@ -41,19 +45,30 @@ router.use(requireAuth);
 // ==========================================
 // 1. STANDARD NOTIFICATIONS
 // ==========================================
-
 router.get("/", getMyNotifications);
-router.patch("/read-all", markAllAsRead);
-router.patch("/:id/read", markAsRead);
+
+router.post("/chat/init", initChatSession);
+router.put("/read-all", markAllAsRead);
+router.put("/:id/read", markAsRead);
 
 // ==========================================
 // 2. CHAT ROUTES
 // ==========================================
 // Fetch previous messages when opening a chat window
-router.get("/chat/:roomId/history", getChatHistory);
+router.get("/chat/sessions", getChatSessions);
+
+router.get("/chat/unread-count", getUnreadChatCount);
+
+router.get("/chat/history", getChatHistory);
 
 // Handle heavy file uploads via REST (Max 10MB limit)
 const upload = createUploader(10);
 router.post("/chat/upload", upload.single("attachment"), uploadChatAttachment);
+
+router.post(
+  "/support/create",
+  upload.single("attachment"),
+  createSupportTicket,
+);
 
 export default router;

@@ -385,6 +385,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   Product: 'Product',
+  MarketplaceClick: 'MarketplaceClick',
   Category: 'Category',
   ShippingZone: 'ShippingZone'
 } as const
@@ -402,7 +403,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "product" | "category" | "shippingZone"
+    modelProps: "product" | "marketplaceClick" | "category" | "shippingZone"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -477,6 +478,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ProductCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ProductCountAggregateOutputType> | number
+        }
+      }
+    }
+    MarketplaceClick: {
+      payload: Prisma.$MarketplaceClickPayload<ExtArgs>
+      fields: Prisma.MarketplaceClickFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MarketplaceClickFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MarketplaceClickPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MarketplaceClickFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MarketplaceClickPayload>
+        }
+        findFirst: {
+          args: Prisma.MarketplaceClickFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MarketplaceClickPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MarketplaceClickFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MarketplaceClickPayload>
+        }
+        findMany: {
+          args: Prisma.MarketplaceClickFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MarketplaceClickPayload>[]
+        }
+        create: {
+          args: Prisma.MarketplaceClickCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MarketplaceClickPayload>
+        }
+        createMany: {
+          args: Prisma.MarketplaceClickCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MarketplaceClickCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MarketplaceClickPayload>[]
+        }
+        delete: {
+          args: Prisma.MarketplaceClickDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MarketplaceClickPayload>
+        }
+        update: {
+          args: Prisma.MarketplaceClickUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MarketplaceClickPayload>
+        }
+        deleteMany: {
+          args: Prisma.MarketplaceClickDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MarketplaceClickUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MarketplaceClickUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MarketplaceClickPayload>[]
+        }
+        upsert: {
+          args: Prisma.MarketplaceClickUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MarketplaceClickPayload>
+        }
+        aggregate: {
+          args: Prisma.MarketplaceClickAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMarketplaceClick>
+        }
+        groupBy: {
+          args: Prisma.MarketplaceClickGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MarketplaceClickGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MarketplaceClickCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MarketplaceClickCountAggregateOutputType> | number
         }
       }
     }
@@ -692,11 +767,27 @@ export const ProductScalarFieldEnum = {
   keywords: 'keywords',
   thumbImage: 'thumbImage',
   imageArray: 'imageArray',
+  avitoLink: 'avitoLink',
+  yandexmarketLink: 'yandexmarketLink',
+  ozonLink: 'ozonLink',
+  wildberriesLink: 'wildberriesLink',
+  amazonLink: 'amazonLink',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
+
+
+export const MarketplaceClickScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  marketplace: 'marketplace',
+  userAgent: 'userAgent',
+  clickedAt: 'clickedAt'
+} as const
+
+export type MarketplaceClickScalarFieldEnum = (typeof MarketplaceClickScalarFieldEnum)[keyof typeof MarketplaceClickScalarFieldEnum]
 
 
 export const CategoryScalarFieldEnum = {
@@ -974,6 +1065,7 @@ export type PrismaClientOptions = ({
 }
 export type GlobalOmitConfig = {
   product?: Prisma.ProductOmit
+  marketplaceClick?: Prisma.MarketplaceClickOmit
   category?: Prisma.CategoryOmit
   shippingZone?: Prisma.ShippingZoneOmit
 }

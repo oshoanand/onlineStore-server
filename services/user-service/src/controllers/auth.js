@@ -33,7 +33,7 @@ export const register = async (req, res, next) => {
         email: email,
         mobile: mobile,
         password: passwordHash,
-        fcmTokens: fcmToken ? [fcmToken] : [], // Use the new string array
+        fcmTokens: fcmToken ? [fcmToken] : [],
         role: "CUSTOMER",
         customerProfile: {
           create: {

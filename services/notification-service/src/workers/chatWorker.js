@@ -4,15 +4,10 @@ import prisma from "../config/prisma.js";
 
 const STREAM_NAME = "stream:chat_messages";
 const GROUP_NAME = "chat_persistence_group";
-
-// Create a unique consumer name per instance/process to avoid conflicts if you scale
 const CONSUMER_NAME = `consumer_${process.pid}_${Math.random().toString(36).substring(2, 9)}`;
 
 export const startChatWorker = async () => {
   try {
-    // 1. Create the Consumer Group
-    // "$" means read from the tail (only new messages).
-    // "MKSTREAM" creates the stream automatically if it doesn't exist yet.
     await redisClient.xgroup(
       "CREATE",
       STREAM_NAME,
@@ -22,35 +17,24 @@ export const startChatWorker = async () => {
     );
     logger.info(`✅ Redis Stream Group '${GROUP_NAME}' created.`);
   } catch (error) {
-    // 2. Handle existing group safely
-    // BUSYGROUP simply means the group was already created on a previous startup. This is normal.
-    if (error.message && error.message.includes("BUSYGROUP")) {
-      logger.info(
-        `⚡ Redis Stream Group '${GROUP_NAME}' already exists. Joining as ${CONSUMER_NAME}...`,
-      );
-    } else {
+    if (error.message && !error.message.includes("BUSYGROUP")) {
       logger.error("❌ Stream group creation error:", error);
-      return; // Exit if it's a critical Redis failure
+      return;
     }
   }
 
   logger.info("🚀 Started Redis Stream Worker for Chat Persistence");
-
-  // 3. Start the polling loop
   pollStream();
 };
 
 const pollStream = async () => {
   try {
-    // 4. Read from the Stream
-    // Blocks for 5000ms (5 seconds) waiting for new messages to avoid CPU-heavy spinning
-    // ">" means read messages that have NEVER been delivered to other consumers in this group
     const results = await redisClient.xreadgroup(
       "GROUP",
       GROUP_NAME,
       CONSUMER_NAME,
       "COUNT",
-      10, // Process up to 10 messages at a time
+      10,
       "BLOCK",
       5000,
       "STREAMS",
@@ -58,22 +42,15 @@ const pollStream = async () => {
       ">",
     );
 
-    // 5. Process Results
     if (results && results.length > 0) {
-      const streamData = results[0]; // [STREAM_NAME, messagesArray]
-      const messages = streamData[1]; // Array of actual messages
+      const messages = results[0][1];
 
       for (const msg of messages) {
-        const redisId = msg[0]; // e.g., "1690000000000-0"
-        const fields = msg[1]; // e.g., ["payload", '{"roomId":"123", ...}']
-
-        // Safely extract the payload string
+        const redisId = msg[0];
+        const fields = msg[1];
         const payloadIndex = fields.indexOf("payload");
+
         if (payloadIndex === -1) {
-          logger.warn(
-            `⚠️ Missing 'payload' in stream message ${redisId}. Skipping.`,
-          );
-          // Acknowledge invalid messages so they don't clog the queue
           await redisClient.xack(STREAM_NAME, GROUP_NAME, redisId);
           continue;
         }
@@ -81,14 +58,34 @@ const pollStream = async () => {
         const rawPayload = fields[payloadIndex + 1];
 
         try {
-          // Parse the JSON payload sent by the Socket.IO event
           const data = JSON.parse(rawPayload);
 
-          // 6. Save to Database
+          const ids = data.roomId.split("_");
+          const [user1Id, user2Id] = ids.sort();
+
+          // 1. Upsert Session: Update lastMessage and force status to OPEN
+          // (Crucial if an admin previously marked the session as CLOSED/RESOLVED)
+          const session = await prisma.chatSession.upsert({
+            where: { user1Id_user2Id: { user1Id, user2Id } },
+            update: {
+              lastMessage: data.content || (data.fileUrl ? "Вложение 📎" : ""),
+              lastActive: new Date(),
+              status: "OPEN",
+            },
+            create: {
+              user1Id,
+              user2Id,
+              lastMessage: data.content || (data.fileUrl ? "Вложение 📎" : ""),
+              lastActive: new Date(),
+              status: "OPEN",
+            },
+          });
+
+          // 2. Save Message to Database
           await prisma.chatMessage.create({
             data: {
               id: data.id,
-              roomId: data.roomId,
+              chatSessionId: session.id,
               senderId: data.senderId,
               senderRole: data.senderRole,
               content: data.content,
@@ -97,34 +94,33 @@ const pollStream = async () => {
               fileType: data.fileType,
               isRead: false,
               isDeleted: false,
+              // Map the replyToId if the user replied to a specific message
+              ...(data.replyToId && { replyToId: data.replyToId }),
               createdAt: data.timestamp ? new Date(data.timestamp) : new Date(),
             },
           });
 
-          // 7. Acknowledge (XACK) the message
-          // This removes it from the Pending Entries List (PEL)
+          // 3. Acknowledge message to remove it from Redis Pending Entries List
           await redisClient.xack(STREAM_NAME, GROUP_NAME, redisId);
-          logger.info(`💾 Persisted chat message: ${data.id}`);
-        } catch (parseOrDbError) {
-          logger.error(
-            `❌ Failed to parse or save message ${redisId}:`,
-            parseOrDbError,
+          logger.info(
+            `💾 Persisted message ${data.id} to session ${session.id}`,
           );
-          // NOTE: We acknowledge (XACK) even on failure to prevent a "Poison Pill" loop
-          // where a badly formatted message crashes the worker infinitely.
-          // In a high-compliance system, you would send this to a Dead Letter Queue (DLQ) instead.
+        } catch (dbError) {
+          logger.error(
+            `❌ DB Persistence failed for message ${redisId}:`,
+            dbError,
+          );
+          // Acknowledge even on DB failure to prevent a poison-pill loop from crashing the worker
           await redisClient.xack(STREAM_NAME, GROUP_NAME, redisId);
         }
       }
     }
   } catch (error) {
-    // Suppress expected timeout/reconnect errors to keep logs clean
     if (error.message && !error.message.includes("Connection is closed")) {
       logger.error("❌ Chat worker polling error:", error);
     }
   } finally {
-    // 8. Recursive Polling
-    // Use setTimeout rather than direct function calls to prevent 'Maximum call stack size exceeded' errors
+    // 4. Recursive Polling loop
     setTimeout(pollStream, 100);
   }
 };

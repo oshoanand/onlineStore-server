@@ -1,4 +1,5 @@
 // import express from "express";
+// import { createProxyMiddleware } from "http-proxy-middleware";
 // import { createServiceProxy } from "../middlewares/proxy.js";
 // import { verifyToken } from "../middlewares/auth.js";
 // import { authLimiter } from "../middlewares/rateLimit.js";
@@ -42,11 +43,15 @@
 // router.use("/api/products/public", createServiceProxy(services.products));
 // router.use("/api/users/articles/public", createServiceProxy(services.users));
 
-// // CRITICAL FIX: Bypass Gateway Auth for WebSockets.
-// // The Notification Service handles WebSocket auth securely via its own io.use() middleware.
+// // 🚨 CRITICAL FIX: Explicitly proxy Socket.IO without path modifications.
+// // This prevents path rewriting anomalies from causing 404 handshaking loops on the backend.
 // router.use(
 //   "/api/notifications/socket.io",
-//   createServiceProxy(services.notifications, true), // true = enable WS proxy
+//   createProxyMiddleware({
+//     target: config.services.notifications,
+//     changeOrigin: true,
+//     ws: true,
+//   }),
 // );
 
 // // ==========================================
@@ -60,7 +65,6 @@
 // router.use("/api/products", createServiceProxy(services.products));
 
 // // Standard REST requests to Notification Service (e.g., GET /api/notifications)
-// // are protected by verifyToken here.
 // router.use("/api/notifications", createServiceProxy(services.notifications));
 
 // export default router;
@@ -101,24 +105,23 @@ const services = {
   },
 };
 
+// 🚨 1. CREATE THE PROXY AS A STANDALONE VARIABLE EXPORT
+export const wsNotificationProxy = createProxyMiddleware({
+  target: config.services.notifications,
+  changeOrigin: true,
+  ws: true,
+});
+
 // ==========================================
-// 1. PUBLIC & WEBSOCKET ROUTES (No Gateway JWT Required)
+// 1. PUBLIC & WEBSOCKET ROUTES
 // ==========================================
 
 router.use("/api/users/auth", authLimiter, createServiceProxy(services.users));
 router.use("/api/products/public", createServiceProxy(services.products));
 router.use("/api/users/articles/public", createServiceProxy(services.users));
 
-// 🚨 CRITICAL FIX: Explicitly proxy Socket.IO without path modifications.
-// This prevents path rewriting anomalies from causing 404 handshaking loops on the backend.
-router.use(
-  "/api/notifications/socket.io",
-  createProxyMiddleware({
-    target: config.services.notifications,
-    changeOrigin: true,
-    ws: true,
-  }),
-);
+// 🚨 2. USE THE EXPORTED PROXY FOR HTTP HANDSHAKES
+router.use("/api/notifications/socket.io", wsNotificationProxy);
 
 // ==========================================
 // 2. PROTECTED ROUTES (Requires Gateway JWT)
@@ -130,7 +133,7 @@ router.use("/api/orders", createServiceProxy(services.orders));
 router.use("/api/payments", createServiceProxy(services.payments));
 router.use("/api/products", createServiceProxy(services.products));
 
-// Standard REST requests to Notification Service (e.g., GET /api/notifications)
+// Standard REST requests
 router.use("/api/notifications", createServiceProxy(services.notifications));
 
 export default router;

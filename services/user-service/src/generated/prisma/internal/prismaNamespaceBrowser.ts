@@ -52,14 +52,16 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
+  AdministratorProfile: 'AdministratorProfile',
   CustomerProfile: 'CustomerProfile',
+  CourierProfile: 'CourierProfile',
+  SupportProfile: 'SupportProfile',
   Address: 'Address',
   BankCard: 'BankCard',
-  AdministratorProfile: 'AdministratorProfile',
   Account: 'Account',
   Session: 'Session',
   VerificationToken: 'VerificationToken',
-  Support: 'Support',
+  SupportTicket: 'SupportTicket',
   Article: 'Article',
   ArticleComment: 'ArticleComment',
   ArticleLike: 'ArticleLike'
@@ -90,6 +92,7 @@ export const UserScalarFieldEnum = {
   role: 'role',
   status: 'status',
   fcmTokens: 'fcmTokens',
+  lastActiveAt: 'lastActiveAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -97,7 +100,38 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const AdministratorProfileScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  fullName: 'fullName',
+  profilePhoto: 'profilePhoto',
+  department: 'department',
+  employeeId: 'employeeId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AdministratorProfileScalarFieldEnum = (typeof AdministratorProfileScalarFieldEnum)[keyof typeof AdministratorProfileScalarFieldEnum]
+
+
 export const CustomerProfileScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  fullName: 'fullName',
+  profilePhoto: 'profilePhoto',
+  totalOrders: 'totalOrders',
+  city: 'city',
+  state: 'state',
+  pincode: 'pincode',
+  fullAddress: 'fullAddress',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CustomerProfileScalarFieldEnum = (typeof CustomerProfileScalarFieldEnum)[keyof typeof CustomerProfileScalarFieldEnum]
+
+
+export const CourierProfileScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   fullName: 'fullName',
@@ -110,7 +144,23 @@ export const CustomerProfileScalarFieldEnum = {
   updatedAt: 'updatedAt'
 } as const
 
-export type CustomerProfileScalarFieldEnum = (typeof CustomerProfileScalarFieldEnum)[keyof typeof CustomerProfileScalarFieldEnum]
+export type CourierProfileScalarFieldEnum = (typeof CourierProfileScalarFieldEnum)[keyof typeof CourierProfileScalarFieldEnum]
+
+
+export const SupportProfileScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  fullName: 'fullName',
+  profilePhoto: 'profilePhoto',
+  city: 'city',
+  state: 'state',
+  pincode: 'pincode',
+  fullAddress: 'fullAddress',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SupportProfileScalarFieldEnum = (typeof SupportProfileScalarFieldEnum)[keyof typeof SupportProfileScalarFieldEnum]
 
 
 export const AddressScalarFieldEnum = {
@@ -143,20 +193,6 @@ export const BankCardScalarFieldEnum = {
 } as const
 
 export type BankCardScalarFieldEnum = (typeof BankCardScalarFieldEnum)[keyof typeof BankCardScalarFieldEnum]
-
-
-export const AdministratorProfileScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  fullName: 'fullName',
-  profilePhoto: 'profilePhoto',
-  department: 'department',
-  employeeId: 'employeeId',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type AdministratorProfileScalarFieldEnum = (typeof AdministratorProfileScalarFieldEnum)[keyof typeof AdministratorProfileScalarFieldEnum]
 
 
 export const AccountScalarFieldEnum = {
@@ -201,21 +237,27 @@ export const VerificationTokenScalarFieldEnum = {
 export type VerificationTokenScalarFieldEnum = (typeof VerificationTokenScalarFieldEnum)[keyof typeof VerificationTokenScalarFieldEnum]
 
 
-export const SupportScalarFieldEnum = {
+export const SupportTicketScalarFieldEnum = {
   id: 'id',
-  postedById: 'postedById',
-  mobile: 'mobile',
-  queryType: 'queryType',
-  message: 'message',
-  photo: 'photo',
+  ticketNumber: 'ticketNumber',
+  subject: 'subject',
+  description: 'description',
+  type: 'type',
+  priority: 'priority',
   status: 'status',
-  adminReply: 'adminReply',
-  resolvedAt: 'resolvedAt',
+  attachments: 'attachments',
+  requesterId: 'requesterId',
+  contactMobile: 'contactMobile',
+  contactEmail: 'contactEmail',
+  assignedManagerId: 'assignedManagerId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  firstResponseAt: 'firstResponseAt',
+  resolvedAt: 'resolvedAt',
+  closedAt: 'closedAt'
 } as const
 
-export type SupportScalarFieldEnum = (typeof SupportScalarFieldEnum)[keyof typeof SupportScalarFieldEnum]
+export type SupportTicketScalarFieldEnum = (typeof SupportTicketScalarFieldEnum)[keyof typeof SupportTicketScalarFieldEnum]
 
 
 export const ArticleScalarFieldEnum = {

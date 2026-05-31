@@ -4,6 +4,14 @@ import { invalidatePattern, fetchCached } from "@shop/event-bus/src/redis.js"; /
 
 const CACHE_PREFIX = "productSvc:products";
 
+const VALID_MARKETPLACES = [
+  "YANDEX_MARKET",
+  "OZON",
+  "WILDBERRIES",
+  "AVITO",
+  "AMAZON",
+];
+
 /**
  * Helper to safely parse JSON/Arrays from multipart/form-data strings
  * (Because arrays and objects arrive as strings in FormData)
@@ -323,7 +331,17 @@ export const createProduct = async (req, res, next) => {
       metaDescription,
       keywords,
       tags,
+      // 🚨 NEW: Destructure the marketplace links
+      avitoLink,
+      yandexmarketLink,
+      ozonLink,
+      wildberriesLink,
+      amazonLink,
     } = req.body;
+
+    // Helper to turn empty strings into null for cleaner DB storage
+    const cleanLink = (link) =>
+      link && link.trim() !== "" ? link.trim() : null;
 
     // 1. Prepare Category Connections (Prisma Many-to-Many Syntax)
     const categoryConnect = [];
@@ -335,31 +353,25 @@ export const createProduct = async (req, res, next) => {
     const parsedTags = parseFormDataField(tags) || [];
 
     // ==========================================
-    // 🚨 NEW: SEO AUTO-GENERATION LOGIC
+    // SEO AUTO-GENERATION LOGIC
     // ==========================================
     let finalMetaTitle = metaTitle;
     let finalMetaDescription = metaDescription;
     let finalKeywords = keywords;
 
-    if (!finalMetaTitle) {
-      finalMetaTitle = name;
-    }
+    if (!finalMetaTitle) finalMetaTitle = name;
 
     if (!finalMetaDescription) {
-      // SEO best practice: keep description around 160 characters
       finalMetaDescription = description ? description.substring(0, 160) : name;
     }
 
     if (!finalKeywords && name && description) {
-      // Combine name and description, lowercase, remove punctuation (supports English & Russian)
       const cleanText = `${name} ${description}`
         .toLowerCase()
-        .replace(/<[^>]*>?/gm, " ") // Strip any HTML tags if present
-        .replace(/[^\w\sа-яА-ЯёЁ]/gi, " "); // Remove punctuation
+        .replace(/<[^>]*>?/gm, " ")
+        .replace(/[^\w\sа-яА-ЯёЁ]/gi, " ");
 
       const wordsArray = cleanText.split(/\s+/);
-
-      // Common stop words to ignore
       const stopWords = new Set([
         "and",
         "the",
@@ -380,13 +392,9 @@ export const createProduct = async (req, res, next) => {
         "от",
         "или",
       ]);
-
-      // Filter out stop words and short words
       const validWords = wordsArray.filter(
         (w) => w.length > 2 && !stopWords.has(w),
       );
-
-      // Get unique words and take up to 8 of them for keywords
       const uniqueWords = [...new Set(validWords)];
       finalKeywords = uniqueWords.slice(0, 8).join(", ");
     }
@@ -425,13 +433,18 @@ export const createProduct = async (req, res, next) => {
         weight,
         dimensions,
         color,
-        // Apply the computed SEO fields here
         metaTitle: finalMetaTitle,
         metaDescription: finalMetaDescription,
         keywords: finalKeywords,
         thumbImage: thumbUrl,
         imageArray: imagesUrls,
         tags: parsedTags,
+        // 🚨 NEW: Inject marketplace links into the database creation
+        avitoLink: cleanLink(avitoLink),
+        yandexmarketLink: cleanLink(yandexmarketLink),
+        ozonLink: cleanLink(ozonLink),
+        wildberriesLink: cleanLink(wildberriesLink),
+        amazonLink: cleanLink(amazonLink),
         categories: {
           connect: categoryConnect,
         },
@@ -451,7 +464,6 @@ export const updateProduct = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    // Destructure out the relations, images, tags, and explicitly grab SEO/Text fields
     const {
       categoryId,
       subCategoryId,
@@ -462,10 +474,15 @@ export const updateProduct = async (req, res, next) => {
       keywords,
       name,
       description,
+      // 🚨 NEW: Explicitly destructure links so we can sanitize them
+      avitoLink,
+      yandexmarketLink,
+      ozonLink,
+      wildberriesLink,
+      amazonLink,
       ...restUpdateData
     } = req.body;
 
-    // 1. Fetch the existing product to handle image fallbacks, slugs, and SEO generation
     const existingProduct = await prisma.product.findUnique({ where: { id } });
     if (!existingProduct) {
       const error = new Error("Product not found");
@@ -476,14 +493,12 @@ export const updateProduct = async (req, res, next) => {
     const slugToUse = restUpdateData.slug || existingProduct.slug;
 
     // ==========================================
-    // 🚨 NEW: SEO AUTO-GENERATION LOGIC (UPDATE)
+    // SEO AUTO-GENERATION LOGIC (UPDATE)
     // ==========================================
-    // Determine the effective text values (use updated ones if provided, else existing)
     const effectiveName = name !== undefined ? name : existingProduct.name;
     const effectiveDescription =
       description !== undefined ? description : existingProduct.description;
 
-    // Determine the effective SEO values
     let finalMetaTitle =
       metaTitle !== undefined ? metaTitle : existingProduct.metaTitle;
     let finalMetaDescription =
@@ -493,16 +508,11 @@ export const updateProduct = async (req, res, next) => {
     let finalKeywords =
       keywords !== undefined ? keywords : existingProduct.keywords;
 
-    // Auto-generate if empty or cleared by the user
-    if (!finalMetaTitle) {
-      finalMetaTitle = effectiveName;
-    }
-
-    if (!finalMetaDescription) {
+    if (!finalMetaTitle) finalMetaTitle = effectiveName;
+    if (!finalMetaDescription)
       finalMetaDescription = effectiveDescription
         ? effectiveDescription.substring(0, 160)
         : effectiveName;
-    }
 
     if (!finalKeywords && effectiveName && effectiveDescription) {
       const cleanText = `${effectiveName} ${effectiveDescription}`
@@ -531,19 +541,15 @@ export const updateProduct = async (req, res, next) => {
         "от",
         "или",
       ]);
-
       const validWords = wordsArray.filter(
         (w) => w.length > 2 && !stopWords.has(w),
       );
       const uniqueWords = [...new Set(validWords)];
-
       finalKeywords = uniqueWords.slice(0, 8).join(", ");
     }
 
     // 2. Handle Images
     let thumbUrl = existingProduct.thumbImage;
-
-    // Parse the kept existing images from the extracted variable
     let imagesUrls = existingProduct.imageArray;
     if (existingImages !== undefined) {
       imagesUrls = parseFormDataField(existingImages) || [];
@@ -558,7 +564,6 @@ export const updateProduct = async (req, res, next) => {
       );
     }
 
-    // If new images are uploaded, add them to the surviving existing images
     if (req.files?.imageArray) {
       const newImageUrls = await Promise.all(
         req.files.imageArray.map((f) =>
@@ -568,7 +573,7 @@ export const updateProduct = async (req, res, next) => {
       imagesUrls = [...imagesUrls, ...newImageUrls];
     }
 
-    // 3. Build the new connection list for Categories
+    // 3. Build Category Connections
     const categoryConnect = [];
     if (categoryId) categoryConnect.push({ id: categoryId });
     if (
@@ -584,18 +589,29 @@ export const updateProduct = async (req, res, next) => {
       updatedTags = parseFormDataField(tags) || [];
     }
 
+    // Helper for update sanitization
+    const sanitizeLinkForUpdate = (link) => {
+      if (link === undefined) return undefined; // Ignore if not provided in payload
+      return link.trim() === "" ? null : link.trim(); // Convert empty string to null
+    };
+
     // 4. Update the Database
     const updatedProduct = await prisma.product.update({
       where: { id },
       data: {
         ...restUpdateData,
-        name, // Pass name back into update payload
-        description, // Pass description back into update payload
-
-        // Apply computed SEO fields
+        name,
+        description,
         metaTitle: finalMetaTitle,
         metaDescription: finalMetaDescription,
         keywords: finalKeywords,
+
+        // 🚨 NEW: Map the sanitized links back into the payload
+        avitoLink: sanitizeLinkForUpdate(avitoLink),
+        yandexmarketLink: sanitizeLinkForUpdate(yandexmarketLink),
+        ozonLink: sanitizeLinkForUpdate(ozonLink),
+        wildberriesLink: sanitizeLinkForUpdate(wildberriesLink),
+        amazonLink: sanitizeLinkForUpdate(amazonLink),
 
         price: restUpdateData.price
           ? parseFloat(restUpdateData.price)
@@ -631,7 +647,6 @@ export const updateProduct = async (req, res, next) => {
     next(error);
   }
 };
-
 // ==========================================
 // ADMIN: GET ALL PRODUCTS (Paginated)
 // ==========================================
@@ -776,6 +791,61 @@ export const deleteProduct = async (req, res, next) => {
       .status(200)
       .json({ success: true, message: "Product deleted successfully" });
   } catch (error) {
+    next(error);
+  }
+};
+
+export const createMarketplaceClickEvent = async (req, res, next) => {
+  try {
+    const { productId, marketplace, userAgent } = req.body;
+
+    // 1. Basic Validation
+    if (!productId || !marketplace) {
+      return res.status(400).json({
+        success: false,
+        message: "productId and marketplace are required fields.",
+      });
+    }
+
+    const normalizedMarketplace = marketplace.toUpperCase();
+
+    if (!VALID_MARKETPLACES.includes(normalizedMarketplace)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid marketplace. Must be one of: ${VALID_MARKETPLACES.join(", ")}`,
+      });
+    }
+
+    // 2. Extract User Agent
+    // Fallback to Express headers if the frontend didn't pass it explicitly
+    const finalUserAgent = userAgent || req.headers["user-agent"] || "Unknown";
+
+    // 3. Save to Database
+    await prisma.marketplaceClick.create({
+      data: {
+        productId,
+        marketplace: normalizedMarketplace,
+        userAgent: finalUserAgent,
+      },
+    });
+
+    // 4. Return 202 Accepted (Standard for non-blocking analytics logs)
+    res.status(202).json({
+      success: true,
+      message: "Marketplace click logged successfully.",
+    });
+  } catch (error) {
+    console.error("[Analytics Error]: Failed to log marketplace click", error);
+
+    // Prisma error code P2003 means Foreign Key constraint failed (Product doesn't exist)
+    if (error.code === "P2003") {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found.",
+      });
+    }
+
+    // Send other errors to the global Express error handler
     next(error);
   }
 };

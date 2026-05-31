@@ -207,6 +207,7 @@ export type AdministratorProfileWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"AdministratorProfile"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"AdministratorProfile"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  ticketsManaged?: Prisma.SupportTicketListRelationFilter
 }
 
 export type AdministratorProfileOrderByWithRelationInput = {
@@ -219,6 +220,7 @@ export type AdministratorProfileOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
+  ticketsManaged?: Prisma.SupportTicketOrderByRelationAggregateInput
 }
 
 export type AdministratorProfileWhereUniqueInput = Prisma.AtLeast<{
@@ -234,6 +236,7 @@ export type AdministratorProfileWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"AdministratorProfile"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"AdministratorProfile"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  ticketsManaged?: Prisma.SupportTicketListRelationFilter
 }, "id" | "userId" | "employeeId">
 
 export type AdministratorProfileOrderByWithAggregationInput = {
@@ -273,6 +276,7 @@ export type AdministratorProfileCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutAdministratorProfileInput
+  ticketsManaged?: Prisma.SupportTicketCreateNestedManyWithoutAssignedManagerInput
 }
 
 export type AdministratorProfileUncheckedCreateInput = {
@@ -284,6 +288,7 @@ export type AdministratorProfileUncheckedCreateInput = {
   employeeId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  ticketsManaged?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutAssignedManagerInput
 }
 
 export type AdministratorProfileUpdateInput = {
@@ -295,6 +300,7 @@ export type AdministratorProfileUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutAdministratorProfileNestedInput
+  ticketsManaged?: Prisma.SupportTicketUpdateManyWithoutAssignedManagerNestedInput
 }
 
 export type AdministratorProfileUncheckedUpdateInput = {
@@ -306,6 +312,7 @@ export type AdministratorProfileUncheckedUpdateInput = {
   employeeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ticketsManaged?: Prisma.SupportTicketUncheckedUpdateManyWithoutAssignedManagerNestedInput
 }
 
 export type AdministratorProfileCreateManyInput = {
@@ -410,6 +417,22 @@ export type AdministratorProfileUncheckedUpdateOneWithoutUserNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AdministratorProfileUpdateToOneWithWhereWithoutUserInput, Prisma.AdministratorProfileUpdateWithoutUserInput>, Prisma.AdministratorProfileUncheckedUpdateWithoutUserInput>
 }
 
+export type AdministratorProfileCreateNestedOneWithoutTicketsManagedInput = {
+  create?: Prisma.XOR<Prisma.AdministratorProfileCreateWithoutTicketsManagedInput, Prisma.AdministratorProfileUncheckedCreateWithoutTicketsManagedInput>
+  connectOrCreate?: Prisma.AdministratorProfileCreateOrConnectWithoutTicketsManagedInput
+  connect?: Prisma.AdministratorProfileWhereUniqueInput
+}
+
+export type AdministratorProfileUpdateOneWithoutTicketsManagedNestedInput = {
+  create?: Prisma.XOR<Prisma.AdministratorProfileCreateWithoutTicketsManagedInput, Prisma.AdministratorProfileUncheckedCreateWithoutTicketsManagedInput>
+  connectOrCreate?: Prisma.AdministratorProfileCreateOrConnectWithoutTicketsManagedInput
+  upsert?: Prisma.AdministratorProfileUpsertWithoutTicketsManagedInput
+  disconnect?: Prisma.AdministratorProfileWhereInput | boolean
+  delete?: Prisma.AdministratorProfileWhereInput | boolean
+  connect?: Prisma.AdministratorProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AdministratorProfileUpdateToOneWithWhereWithoutTicketsManagedInput, Prisma.AdministratorProfileUpdateWithoutTicketsManagedInput>, Prisma.AdministratorProfileUncheckedUpdateWithoutTicketsManagedInput>
+}
+
 export type AdministratorProfileCreateWithoutUserInput = {
   id?: string
   fullName: string
@@ -418,6 +441,7 @@ export type AdministratorProfileCreateWithoutUserInput = {
   employeeId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  ticketsManaged?: Prisma.SupportTicketCreateNestedManyWithoutAssignedManagerInput
 }
 
 export type AdministratorProfileUncheckedCreateWithoutUserInput = {
@@ -428,6 +452,7 @@ export type AdministratorProfileUncheckedCreateWithoutUserInput = {
   employeeId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  ticketsManaged?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutAssignedManagerInput
 }
 
 export type AdministratorProfileCreateOrConnectWithoutUserInput = {
@@ -454,6 +479,7 @@ export type AdministratorProfileUpdateWithoutUserInput = {
   employeeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ticketsManaged?: Prisma.SupportTicketUpdateManyWithoutAssignedManagerNestedInput
 }
 
 export type AdministratorProfileUncheckedUpdateWithoutUserInput = {
@@ -464,8 +490,98 @@ export type AdministratorProfileUncheckedUpdateWithoutUserInput = {
   employeeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ticketsManaged?: Prisma.SupportTicketUncheckedUpdateManyWithoutAssignedManagerNestedInput
 }
 
+export type AdministratorProfileCreateWithoutTicketsManagedInput = {
+  id?: string
+  fullName: string
+  profilePhoto?: string | null
+  department?: string | null
+  employeeId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutAdministratorProfileInput
+}
+
+export type AdministratorProfileUncheckedCreateWithoutTicketsManagedInput = {
+  id?: string
+  userId: string
+  fullName: string
+  profilePhoto?: string | null
+  department?: string | null
+  employeeId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type AdministratorProfileCreateOrConnectWithoutTicketsManagedInput = {
+  where: Prisma.AdministratorProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.AdministratorProfileCreateWithoutTicketsManagedInput, Prisma.AdministratorProfileUncheckedCreateWithoutTicketsManagedInput>
+}
+
+export type AdministratorProfileUpsertWithoutTicketsManagedInput = {
+  update: Prisma.XOR<Prisma.AdministratorProfileUpdateWithoutTicketsManagedInput, Prisma.AdministratorProfileUncheckedUpdateWithoutTicketsManagedInput>
+  create: Prisma.XOR<Prisma.AdministratorProfileCreateWithoutTicketsManagedInput, Prisma.AdministratorProfileUncheckedCreateWithoutTicketsManagedInput>
+  where?: Prisma.AdministratorProfileWhereInput
+}
+
+export type AdministratorProfileUpdateToOneWithWhereWithoutTicketsManagedInput = {
+  where?: Prisma.AdministratorProfileWhereInput
+  data: Prisma.XOR<Prisma.AdministratorProfileUpdateWithoutTicketsManagedInput, Prisma.AdministratorProfileUncheckedUpdateWithoutTicketsManagedInput>
+}
+
+export type AdministratorProfileUpdateWithoutTicketsManagedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employeeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutAdministratorProfileNestedInput
+}
+
+export type AdministratorProfileUncheckedUpdateWithoutTicketsManagedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employeeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+
+/**
+ * Count Type AdministratorProfileCountOutputType
+ */
+
+export type AdministratorProfileCountOutputType = {
+  ticketsManaged: number
+}
+
+export type AdministratorProfileCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ticketsManaged?: boolean | AdministratorProfileCountOutputTypeCountTicketsManagedArgs
+}
+
+/**
+ * AdministratorProfileCountOutputType without action
+ */
+export type AdministratorProfileCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AdministratorProfileCountOutputType
+   */
+  select?: Prisma.AdministratorProfileCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * AdministratorProfileCountOutputType without action
+ */
+export type AdministratorProfileCountOutputTypeCountTicketsManagedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SupportTicketWhereInput
+}
 
 
 export type AdministratorProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -478,6 +594,8 @@ export type AdministratorProfileSelect<ExtArgs extends runtime.Types.Extensions.
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  ticketsManaged?: boolean | Prisma.AdministratorProfile$ticketsManagedArgs<ExtArgs>
+  _count?: boolean | Prisma.AdministratorProfileCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["administratorProfile"]>
 
 export type AdministratorProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -518,6 +636,8 @@ export type AdministratorProfileSelectScalar = {
 export type AdministratorProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "fullName" | "profilePhoto" | "department" | "employeeId" | "createdAt" | "updatedAt", ExtArgs["result"]["administratorProfile"]>
 export type AdministratorProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  ticketsManaged?: boolean | Prisma.AdministratorProfile$ticketsManagedArgs<ExtArgs>
+  _count?: boolean | Prisma.AdministratorProfileCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AdministratorProfileIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -530,6 +650,7 @@ export type $AdministratorProfilePayload<ExtArgs extends runtime.Types.Extension
   name: "AdministratorProfile"
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
+    ticketsManaged: Prisma.$SupportTicketPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -935,6 +1056,7 @@ readonly fields: AdministratorProfileFieldRefs;
 export interface Prisma__AdministratorProfileClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  ticketsManaged<T extends Prisma.AdministratorProfile$ticketsManagedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AdministratorProfile$ticketsManagedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportTicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1370,6 +1492,30 @@ export type AdministratorProfileDeleteManyArgs<ExtArgs extends runtime.Types.Ext
    * Limit how many AdministratorProfiles to delete.
    */
   limit?: number
+}
+
+/**
+ * AdministratorProfile.ticketsManaged
+ */
+export type AdministratorProfile$ticketsManagedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SupportTicket
+   */
+  select?: Prisma.SupportTicketSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SupportTicket
+   */
+  omit?: Prisma.SupportTicketOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SupportTicketInclude<ExtArgs> | null
+  where?: Prisma.SupportTicketWhereInput
+  orderBy?: Prisma.SupportTicketOrderByWithRelationInput | Prisma.SupportTicketOrderByWithRelationInput[]
+  cursor?: Prisma.SupportTicketWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SupportTicketScalarFieldEnum | Prisma.SupportTicketScalarFieldEnum[]
 }
 
 /**

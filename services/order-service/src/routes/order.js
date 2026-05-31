@@ -3,10 +3,12 @@ import {
   createOrder,
   getUserOrders,
   getOrderById,
+  getOrderByIdForAdmin,
   getAllOrdersAdmin,
   updateOrderStatus,
   verifyCourierDelivery,
   getInternalOrder,
+  getInternalUserStats,
 } from "../controllers/order.js";
 import { requireAuth, requireAdmin } from "../middlewares/authHeaders.js";
 import { requireInternalAuth } from "@shop/utils";
@@ -19,6 +21,11 @@ const router = express.Router();
 // 🚨 MUST be placed BEFORE `router.use(requireAuth)` because these
 // rely on the x-internal-secret header, not a user JWT.
 router.get("/internal/:id", requireInternalAuth, getInternalOrder);
+router.get(
+  ["/internal/users/:userId/stats"],
+  requireInternalAuth,
+  getInternalUserStats,
+);
 
 // ==========================================
 // 1. STANDARD PROTECTED ROUTES (Requires JWT)
@@ -34,6 +41,7 @@ router.get("/", getUserOrders);
 // ==========================================
 // 🚨 MUST be placed before /:id so Express doesn't treat "admin" as an ID parameter
 router.get("/admin/all", requireAdmin, getAllOrdersAdmin);
+router.get("/admin/:id", requireAdmin, getOrderByIdForAdmin);
 router.patch("/admin/:id/status", requireAdmin, updateOrderStatus);
 
 // ==========================================

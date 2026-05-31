@@ -23,10 +23,25 @@ export * from './enums.ts';
  */
 export type User = Prisma.UserModel
 /**
+ * Model AdministratorProfile
+ * 
+ */
+export type AdministratorProfile = Prisma.AdministratorProfileModel
+/**
  * Model CustomerProfile
  * 
  */
 export type CustomerProfile = Prisma.CustomerProfileModel
+/**
+ * Model CourierProfile
+ * 
+ */
+export type CourierProfile = Prisma.CourierProfileModel
+/**
+ * Model SupportProfile
+ * 
+ */
+export type SupportProfile = Prisma.SupportProfileModel
 /**
  * Model Address
  * 
@@ -37,11 +52,6 @@ export type Address = Prisma.AddressModel
  * 
  */
 export type BankCard = Prisma.BankCardModel
-/**
- * Model AdministratorProfile
- * 
- */
-export type AdministratorProfile = Prisma.AdministratorProfileModel
 /**
  * Model Account
  * 
@@ -58,10 +68,10 @@ export type Session = Prisma.SessionModel
  */
 export type VerificationToken = Prisma.VerificationTokenModel
 /**
- * Model Support
+ * Model SupportTicket
  * 
  */
-export type Support = Prisma.SupportModel
+export type SupportTicket = Prisma.SupportTicketModel
 /**
  * Model Article
  * 

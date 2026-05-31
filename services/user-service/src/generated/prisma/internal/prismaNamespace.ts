@@ -385,14 +385,16 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   User: 'User',
+  AdministratorProfile: 'AdministratorProfile',
   CustomerProfile: 'CustomerProfile',
+  CourierProfile: 'CourierProfile',
+  SupportProfile: 'SupportProfile',
   Address: 'Address',
   BankCard: 'BankCard',
-  AdministratorProfile: 'AdministratorProfile',
   Account: 'Account',
   Session: 'Session',
   VerificationToken: 'VerificationToken',
-  Support: 'Support',
+  SupportTicket: 'SupportTicket',
   Article: 'Article',
   ArticleComment: 'ArticleComment',
   ArticleLike: 'ArticleLike'
@@ -411,7 +413,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "customerProfile" | "address" | "bankCard" | "administratorProfile" | "account" | "session" | "verificationToken" | "support" | "article" | "articleComment" | "articleLike"
+    modelProps: "user" | "administratorProfile" | "customerProfile" | "courierProfile" | "supportProfile" | "address" | "bankCard" | "account" | "session" | "verificationToken" | "supportTicket" | "article" | "articleComment" | "articleLike"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -489,6 +491,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    AdministratorProfile: {
+      payload: Prisma.$AdministratorProfilePayload<ExtArgs>
+      fields: Prisma.AdministratorProfileFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AdministratorProfileFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdministratorProfilePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AdministratorProfileFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdministratorProfilePayload>
+        }
+        findFirst: {
+          args: Prisma.AdministratorProfileFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdministratorProfilePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AdministratorProfileFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdministratorProfilePayload>
+        }
+        findMany: {
+          args: Prisma.AdministratorProfileFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdministratorProfilePayload>[]
+        }
+        create: {
+          args: Prisma.AdministratorProfileCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdministratorProfilePayload>
+        }
+        createMany: {
+          args: Prisma.AdministratorProfileCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AdministratorProfileCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdministratorProfilePayload>[]
+        }
+        delete: {
+          args: Prisma.AdministratorProfileDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdministratorProfilePayload>
+        }
+        update: {
+          args: Prisma.AdministratorProfileUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdministratorProfilePayload>
+        }
+        deleteMany: {
+          args: Prisma.AdministratorProfileDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AdministratorProfileUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AdministratorProfileUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdministratorProfilePayload>[]
+        }
+        upsert: {
+          args: Prisma.AdministratorProfileUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdministratorProfilePayload>
+        }
+        aggregate: {
+          args: Prisma.AdministratorProfileAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAdministratorProfile>
+        }
+        groupBy: {
+          args: Prisma.AdministratorProfileGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AdministratorProfileGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AdministratorProfileCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AdministratorProfileCountAggregateOutputType> | number
+        }
+      }
+    }
     CustomerProfile: {
       payload: Prisma.$CustomerProfilePayload<ExtArgs>
       fields: Prisma.CustomerProfileFieldRefs
@@ -560,6 +636,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.CustomerProfileCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.CustomerProfileCountAggregateOutputType> | number
+        }
+      }
+    }
+    CourierProfile: {
+      payload: Prisma.$CourierProfilePayload<ExtArgs>
+      fields: Prisma.CourierProfileFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CourierProfileFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourierProfilePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CourierProfileFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourierProfilePayload>
+        }
+        findFirst: {
+          args: Prisma.CourierProfileFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourierProfilePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CourierProfileFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourierProfilePayload>
+        }
+        findMany: {
+          args: Prisma.CourierProfileFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourierProfilePayload>[]
+        }
+        create: {
+          args: Prisma.CourierProfileCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourierProfilePayload>
+        }
+        createMany: {
+          args: Prisma.CourierProfileCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CourierProfileCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourierProfilePayload>[]
+        }
+        delete: {
+          args: Prisma.CourierProfileDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourierProfilePayload>
+        }
+        update: {
+          args: Prisma.CourierProfileUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourierProfilePayload>
+        }
+        deleteMany: {
+          args: Prisma.CourierProfileDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CourierProfileUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CourierProfileUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourierProfilePayload>[]
+        }
+        upsert: {
+          args: Prisma.CourierProfileUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CourierProfilePayload>
+        }
+        aggregate: {
+          args: Prisma.CourierProfileAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCourierProfile>
+        }
+        groupBy: {
+          args: Prisma.CourierProfileGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CourierProfileGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CourierProfileCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CourierProfileCountAggregateOutputType> | number
+        }
+      }
+    }
+    SupportProfile: {
+      payload: Prisma.$SupportProfilePayload<ExtArgs>
+      fields: Prisma.SupportProfileFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SupportProfileFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportProfilePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SupportProfileFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportProfilePayload>
+        }
+        findFirst: {
+          args: Prisma.SupportProfileFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportProfilePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SupportProfileFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportProfilePayload>
+        }
+        findMany: {
+          args: Prisma.SupportProfileFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportProfilePayload>[]
+        }
+        create: {
+          args: Prisma.SupportProfileCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportProfilePayload>
+        }
+        createMany: {
+          args: Prisma.SupportProfileCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SupportProfileCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportProfilePayload>[]
+        }
+        delete: {
+          args: Prisma.SupportProfileDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportProfilePayload>
+        }
+        update: {
+          args: Prisma.SupportProfileUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportProfilePayload>
+        }
+        deleteMany: {
+          args: Prisma.SupportProfileDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SupportProfileUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SupportProfileUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportProfilePayload>[]
+        }
+        upsert: {
+          args: Prisma.SupportProfileUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportProfilePayload>
+        }
+        aggregate: {
+          args: Prisma.SupportProfileAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSupportProfile>
+        }
+        groupBy: {
+          args: Prisma.SupportProfileGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SupportProfileGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SupportProfileCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SupportProfileCountAggregateOutputType> | number
         }
       }
     }
@@ -708,80 +932,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.BankCardCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.BankCardCountAggregateOutputType> | number
-        }
-      }
-    }
-    AdministratorProfile: {
-      payload: Prisma.$AdministratorProfilePayload<ExtArgs>
-      fields: Prisma.AdministratorProfileFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.AdministratorProfileFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdministratorProfilePayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.AdministratorProfileFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdministratorProfilePayload>
-        }
-        findFirst: {
-          args: Prisma.AdministratorProfileFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdministratorProfilePayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.AdministratorProfileFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdministratorProfilePayload>
-        }
-        findMany: {
-          args: Prisma.AdministratorProfileFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdministratorProfilePayload>[]
-        }
-        create: {
-          args: Prisma.AdministratorProfileCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdministratorProfilePayload>
-        }
-        createMany: {
-          args: Prisma.AdministratorProfileCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.AdministratorProfileCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdministratorProfilePayload>[]
-        }
-        delete: {
-          args: Prisma.AdministratorProfileDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdministratorProfilePayload>
-        }
-        update: {
-          args: Prisma.AdministratorProfileUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdministratorProfilePayload>
-        }
-        deleteMany: {
-          args: Prisma.AdministratorProfileDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.AdministratorProfileUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.AdministratorProfileUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdministratorProfilePayload>[]
-        }
-        upsert: {
-          args: Prisma.AdministratorProfileUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdministratorProfilePayload>
-        }
-        aggregate: {
-          args: Prisma.AdministratorProfileAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateAdministratorProfile>
-        }
-        groupBy: {
-          args: Prisma.AdministratorProfileGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AdministratorProfileGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.AdministratorProfileCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AdministratorProfileCountAggregateOutputType> | number
         }
       }
     }
@@ -1007,77 +1157,77 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    Support: {
-      payload: Prisma.$SupportPayload<ExtArgs>
-      fields: Prisma.SupportFieldRefs
+    SupportTicket: {
+      payload: Prisma.$SupportTicketPayload<ExtArgs>
+      fields: Prisma.SupportTicketFieldRefs
       operations: {
         findUnique: {
-          args: Prisma.SupportFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportPayload> | null
+          args: Prisma.SupportTicketFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportTicketPayload> | null
         }
         findUniqueOrThrow: {
-          args: Prisma.SupportFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportPayload>
+          args: Prisma.SupportTicketFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportTicketPayload>
         }
         findFirst: {
-          args: Prisma.SupportFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportPayload> | null
+          args: Prisma.SupportTicketFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportTicketPayload> | null
         }
         findFirstOrThrow: {
-          args: Prisma.SupportFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportPayload>
+          args: Prisma.SupportTicketFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportTicketPayload>
         }
         findMany: {
-          args: Prisma.SupportFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportPayload>[]
+          args: Prisma.SupportTicketFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportTicketPayload>[]
         }
         create: {
-          args: Prisma.SupportCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportPayload>
+          args: Prisma.SupportTicketCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportTicketPayload>
         }
         createMany: {
-          args: Prisma.SupportCreateManyArgs<ExtArgs>
+          args: Prisma.SupportTicketCreateManyArgs<ExtArgs>
           result: BatchPayload
         }
         createManyAndReturn: {
-          args: Prisma.SupportCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportPayload>[]
+          args: Prisma.SupportTicketCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportTicketPayload>[]
         }
         delete: {
-          args: Prisma.SupportDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportPayload>
+          args: Prisma.SupportTicketDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportTicketPayload>
         }
         update: {
-          args: Prisma.SupportUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportPayload>
+          args: Prisma.SupportTicketUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportTicketPayload>
         }
         deleteMany: {
-          args: Prisma.SupportDeleteManyArgs<ExtArgs>
+          args: Prisma.SupportTicketDeleteManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateMany: {
-          args: Prisma.SupportUpdateManyArgs<ExtArgs>
+          args: Prisma.SupportTicketUpdateManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateManyAndReturn: {
-          args: Prisma.SupportUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportPayload>[]
+          args: Prisma.SupportTicketUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportTicketPayload>[]
         }
         upsert: {
-          args: Prisma.SupportUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportPayload>
+          args: Prisma.SupportTicketUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SupportTicketPayload>
         }
         aggregate: {
-          args: Prisma.SupportAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateSupport>
+          args: Prisma.SupportTicketAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSupportTicket>
         }
         groupBy: {
-          args: Prisma.SupportGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.SupportGroupByOutputType>[]
+          args: Prisma.SupportTicketGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SupportTicketGroupByOutputType>[]
         }
         count: {
-          args: Prisma.SupportCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.SupportCountAggregateOutputType> | number
+          args: Prisma.SupportTicketCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SupportTicketCountAggregateOutputType> | number
         }
       }
     }
@@ -1351,6 +1501,7 @@ export const UserScalarFieldEnum = {
   role: 'role',
   status: 'status',
   fcmTokens: 'fcmTokens',
+  lastActiveAt: 'lastActiveAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1358,7 +1509,38 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const AdministratorProfileScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  fullName: 'fullName',
+  profilePhoto: 'profilePhoto',
+  department: 'department',
+  employeeId: 'employeeId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AdministratorProfileScalarFieldEnum = (typeof AdministratorProfileScalarFieldEnum)[keyof typeof AdministratorProfileScalarFieldEnum]
+
+
 export const CustomerProfileScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  fullName: 'fullName',
+  profilePhoto: 'profilePhoto',
+  totalOrders: 'totalOrders',
+  city: 'city',
+  state: 'state',
+  pincode: 'pincode',
+  fullAddress: 'fullAddress',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CustomerProfileScalarFieldEnum = (typeof CustomerProfileScalarFieldEnum)[keyof typeof CustomerProfileScalarFieldEnum]
+
+
+export const CourierProfileScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   fullName: 'fullName',
@@ -1371,7 +1553,23 @@ export const CustomerProfileScalarFieldEnum = {
   updatedAt: 'updatedAt'
 } as const
 
-export type CustomerProfileScalarFieldEnum = (typeof CustomerProfileScalarFieldEnum)[keyof typeof CustomerProfileScalarFieldEnum]
+export type CourierProfileScalarFieldEnum = (typeof CourierProfileScalarFieldEnum)[keyof typeof CourierProfileScalarFieldEnum]
+
+
+export const SupportProfileScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  fullName: 'fullName',
+  profilePhoto: 'profilePhoto',
+  city: 'city',
+  state: 'state',
+  pincode: 'pincode',
+  fullAddress: 'fullAddress',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SupportProfileScalarFieldEnum = (typeof SupportProfileScalarFieldEnum)[keyof typeof SupportProfileScalarFieldEnum]
 
 
 export const AddressScalarFieldEnum = {
@@ -1404,20 +1602,6 @@ export const BankCardScalarFieldEnum = {
 } as const
 
 export type BankCardScalarFieldEnum = (typeof BankCardScalarFieldEnum)[keyof typeof BankCardScalarFieldEnum]
-
-
-export const AdministratorProfileScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  fullName: 'fullName',
-  profilePhoto: 'profilePhoto',
-  department: 'department',
-  employeeId: 'employeeId',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type AdministratorProfileScalarFieldEnum = (typeof AdministratorProfileScalarFieldEnum)[keyof typeof AdministratorProfileScalarFieldEnum]
 
 
 export const AccountScalarFieldEnum = {
@@ -1462,21 +1646,27 @@ export const VerificationTokenScalarFieldEnum = {
 export type VerificationTokenScalarFieldEnum = (typeof VerificationTokenScalarFieldEnum)[keyof typeof VerificationTokenScalarFieldEnum]
 
 
-export const SupportScalarFieldEnum = {
+export const SupportTicketScalarFieldEnum = {
   id: 'id',
-  postedById: 'postedById',
-  mobile: 'mobile',
-  queryType: 'queryType',
-  message: 'message',
-  photo: 'photo',
+  ticketNumber: 'ticketNumber',
+  subject: 'subject',
+  description: 'description',
+  type: 'type',
+  priority: 'priority',
   status: 'status',
-  adminReply: 'adminReply',
-  resolvedAt: 'resolvedAt',
+  attachments: 'attachments',
+  requesterId: 'requesterId',
+  contactMobile: 'contactMobile',
+  contactEmail: 'contactEmail',
+  assignedManagerId: 'assignedManagerId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  firstResponseAt: 'firstResponseAt',
+  resolvedAt: 'resolvedAt',
+  closedAt: 'closedAt'
 } as const
 
-export type SupportScalarFieldEnum = (typeof SupportScalarFieldEnum)[keyof typeof SupportScalarFieldEnum]
+export type SupportTicketScalarFieldEnum = (typeof SupportTicketScalarFieldEnum)[keyof typeof SupportTicketScalarFieldEnum]
 
 
 export const ArticleScalarFieldEnum = {
@@ -1608,13 +1798,6 @@ export type ListEnumUserStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$P
 
 
 /**
- * Reference to a field of type 'Boolean'
- */
-export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
-    
-
-
-/**
  * Reference to a field of type 'Int'
  */
 export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -1629,16 +1812,51 @@ export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
- * Reference to a field of type 'SupportStatus'
+ * Reference to a field of type 'Boolean'
  */
-export type EnumSupportStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SupportStatus'>
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
 /**
- * Reference to a field of type 'SupportStatus[]'
+ * Reference to a field of type 'TicketType'
  */
-export type ListEnumSupportStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SupportStatus[]'>
+export type EnumTicketTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TicketType'>
+    
+
+
+/**
+ * Reference to a field of type 'TicketType[]'
+ */
+export type ListEnumTicketTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TicketType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'TicketPriority'
+ */
+export type EnumTicketPriorityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TicketPriority'>
+    
+
+
+/**
+ * Reference to a field of type 'TicketPriority[]'
+ */
+export type ListEnumTicketPriorityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TicketPriority[]'>
+    
+
+
+/**
+ * Reference to a field of type 'TicketStatus'
+ */
+export type EnumTicketStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TicketStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'TicketStatus[]'
+ */
+export type ListEnumTicketStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TicketStatus[]'>
     
 
 
@@ -1751,14 +1969,16 @@ export type PrismaClientOptions = ({
 }
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
+  administratorProfile?: Prisma.AdministratorProfileOmit
   customerProfile?: Prisma.CustomerProfileOmit
+  courierProfile?: Prisma.CourierProfileOmit
+  supportProfile?: Prisma.SupportProfileOmit
   address?: Prisma.AddressOmit
   bankCard?: Prisma.BankCardOmit
-  administratorProfile?: Prisma.AdministratorProfileOmit
   account?: Prisma.AccountOmit
   session?: Prisma.SessionOmit
   verificationToken?: Prisma.VerificationTokenOmit
-  support?: Prisma.SupportOmit
+  supportTicket?: Prisma.SupportTicketOmit
   article?: Prisma.ArticleOmit
   articleComment?: Prisma.ArticleCommentOmit
   articleLike?: Prisma.ArticleLikeOmit

@@ -23,6 +23,11 @@ export * from './enums.ts';
  */
 export type Notification = Prisma.NotificationModel
 /**
+ * Model ChatSession
+ * 
+ */
+export type ChatSession = Prisma.ChatSessionModel
+/**
  * Model ChatMessage
  * 
  */

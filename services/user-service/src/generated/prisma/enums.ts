@@ -12,18 +12,11 @@
 export const Role = {
   CUSTOMER: 'CUSTOMER',
   ADMINISTRATOR: 'ADMINISTRATOR',
-  SUPPORT: 'SUPPORT'
+  SUPPORT: 'SUPPORT',
+  COURIER: 'COURIER'
 } as const
 
 export type Role = (typeof Role)[keyof typeof Role]
-
-
-export const SupportStatus = {
-  PENDING: 'PENDING',
-  RESOLVED: 'RESOLVED'
-} as const
-
-export type SupportStatus = (typeof SupportStatus)[keyof typeof SupportStatus]
 
 
 export const UserStatus = {
@@ -33,3 +26,36 @@ export const UserStatus = {
 } as const
 
 export type UserStatus = (typeof UserStatus)[keyof typeof UserStatus]
+
+
+export const TicketStatus = {
+  OPEN: 'OPEN',
+  IN_PROGRESS: 'IN_PROGRESS',
+  WAITING_ON_CUSTOMER: 'WAITING_ON_CUSTOMER',
+  RESOLVED: 'RESOLVED',
+  CLOSED: 'CLOSED'
+} as const
+
+export type TicketStatus = (typeof TicketStatus)[keyof typeof TicketStatus]
+
+
+export const TicketPriority = {
+  LOW: 'LOW',
+  NORMAL: 'NORMAL',
+  HIGH: 'HIGH',
+  URGENT: 'URGENT'
+} as const
+
+export type TicketPriority = (typeof TicketPriority)[keyof typeof TicketPriority]
+
+
+export const TicketType = {
+  BUG_REPORT: 'BUG_REPORT',
+  FEATURE_REQUEST: 'FEATURE_REQUEST',
+  BILLING: 'BILLING',
+  TECHNICAL_SUPPORT: 'TECHNICAL_SUPPORT',
+  GENERAL_INQUIRY: 'GENERAL_INQUIRY',
+  OTHER: 'OTHER'
+} as const
+
+export type TicketType = (typeof TicketType)[keyof typeof TicketType]

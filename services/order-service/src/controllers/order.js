@@ -406,22 +406,168 @@ export const getUserOrders = async (req, res, next) => {
   }
 };
 
+// export const getOrderById = async (req, res, next) => {
+//   try {
+//     const order = await prisma.order.findUnique({
+//       where: { id: req.params.id, userId: req.user.id },
+//       include: {
+//         items: true,
+//         history: { orderBy: { createdAt: "desc" } },
+//       },
+//     });
+
+//     if (!order) throw new NotFoundError("Order not found");
+//     res.status(200).json({ status: "success", data: order });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+// ==========================================
+// CUSTOMER: GET SINGLE ORDER
+// ==========================================
 export const getOrderById = async (req, res, next) => {
   try {
+    const { id } = req.params;
+    const userId = req.user.id;
+
+    // Strict ownership check: only fetch if userId matches the token
     const order = await prisma.order.findUnique({
-      where: { id: req.params.id, userId: req.user.id },
+      where: { id, userId },
       include: {
         items: true,
         history: { orderBy: { createdAt: "desc" } },
       },
     });
 
-    if (!order) throw new NotFoundError("Order not found");
+    if (!order) {
+      throw new NotFoundError("Order not found");
+    }
+
     res.status(200).json({ status: "success", data: order });
   } catch (error) {
     next(error);
   }
 };
+
+// ==========================================
+// ADMIN: GET SINGLE ORDER (WITH USER DATA)
+// ==========================================
+export const getOrderByIdForAdmin = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const order = await prisma.order.findUnique({
+      where: { id },
+      include: {
+        items: true,
+        history: { orderBy: { createdAt: "desc" } },
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundError("Order not found");
+    } else {
+      const userServiceUrl =
+        process.env.USER_SERVICE_URL || "http://localhost:4002";
+      const requestUrl = `${userServiceUrl}/internal/${order.userId}`;
+
+      const { data: userRes } = await axios.get(requestUrl, {
+        headers: { "x-internal-secret": process.env.INTERNAL_API_SECRET },
+      });
+
+      console.log(userRes.data);
+      if (userRes && userRes.data) {
+        const user = userRes.data;
+        const customerData = {
+          id: user.id,
+          email: user.email,
+          mobile: user.mobile,
+          fullName: user.customerProfile?.fullName || "Имя не указано",
+          profilePhoto: user.customerProfile?.profilePhoto || null,
+        };
+
+        res.status(200).json({
+          status: "success",
+          data: {
+            ...order,
+            customer: customerData,
+          },
+        });
+      }
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ==========================================
+// 3. ADMIN: GET ALL ORDERS (PAGINATED & CACHED)
+// ==========================================
+// export const getAllOrdersAdmin = async (req, res, next) => {
+//   try {
+//     const page = Math.max(1, parseInt(req.query.page) || 1);
+//     const limit = Math.max(1, parseInt(req.query.limit) || 10);
+//     const skip = (page - 1) * limit;
+//     const { status, search } = req.query;
+
+//     // 🚨 1. Construct a highly specific cache suffix
+//     // This ensures that different pages, filters, and searches don't overwrite each other in Redis
+//     const cacheSuffix = `page_${page}:limit_${limit}:status_${status || "ALL"}:search_${search || "none"}`;
+
+//     // 🚨 2. Fetch from Redis, or execute the DB query if it's a cache miss
+//     const cachedResult = await fetchCached(
+//       "orders:admin", // Resource Prefix
+//       cacheSuffix, // Unique Suffix
+//       async () => {
+//         // Fallback Database Query
+//         const where = {};
+//         if (status && status !== "ALL") {
+//           where.status = status;
+//         }
+//         if (search) {
+//           where.OR = [
+//             { id: { contains: search, mode: "insensitive" } },
+//             { userId: { contains: search, mode: "insensitive" } },
+//           ];
+//         }
+
+//         const [orders, total] = await Promise.all([
+//           prisma.order.findMany({
+//             where,
+//             skip,
+//             take: limit,
+//             orderBy: { createdAt: "desc" },
+//             include: {
+//               items: true,
+//               history: { orderBy: { createdAt: "desc" }, take: 1 },
+//             },
+//           }),
+//           prisma.order.count({ where }),
+//         ]);
+
+//         // Return an object containing BOTH results to cache them together
+//         return { orders, total };
+//       },
+//       300, // TTL: 5 minutes. Admin data changes fast, so a short TTL absorbs traffic spikes without showing terribly stale data.
+//     );
+
+//     // 3. Destructure the result (whether it came from Redis or DB)
+//     const { orders, total } = cachedResult;
+
+//     res.status(200).json({
+//       success: true,
+//       data: orders,
+//       pagination: {
+//         total,
+//         page,
+//         limit,
+//         totalPages: Math.ceil(total / limit),
+//       },
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
 // ==========================================
 // 3. ADMIN: GET ALL ORDERS (PAGINATED & CACHED)
@@ -431,27 +577,57 @@ export const getAllOrdersAdmin = async (req, res, next) => {
     const page = Math.max(1, parseInt(req.query.page) || 1);
     const limit = Math.max(1, parseInt(req.query.limit) || 10);
     const skip = (page - 1) * limit;
-    const { status, search } = req.query;
 
-    // 🚨 1. Construct a highly specific cache suffix
-    // This ensures that different pages, filters, and searches don't overwrite each other in Redis
-    const cacheSuffix = `page_${page}:limit_${limit}:status_${status || "ALL"}:search_${search || "none"}`;
+    const { status, search, sortBy, sortOrder, startDate, endDate } = req.query;
 
-    // 🚨 2. Fetch from Redis, or execute the DB query if it's a cache miss
+    const cacheSuffix = `page_${page}:limit_${limit}:status_${status || "ALL"}:search_${search || "none"}:sort_${sortBy || "createdAt"}_${sortOrder || "desc"}:date_${startDate || "none"}_${endDate || "none"}`;
+
     const cachedResult = await fetchCached(
-      "orders:admin", // Resource Prefix
-      cacheSuffix, // Unique Suffix
+      "orders:admin",
+      cacheSuffix,
       async () => {
-        // Fallback Database Query
         const where = {};
+
+        // 1. Filter by Status
         if (status && status !== "ALL") {
           where.status = status;
         }
-        if (search) {
+
+        // 2. 🚨 Filter strictly by Order ID
+        if (search && search.trim() !== "") {
+          const searchTerm = search.trim();
+
           where.OR = [
-            { id: { contains: search, mode: "insensitive" } },
-            { userId: { contains: search, mode: "insensitive" } },
+            // Matches the friendly 8-digit orderId (e.g. "45981234")
+            { orderId: { contains: searchTerm, mode: "insensitive" } },
+            // Matches the exact backend UUID if they paste the full system ID
+            ...(searchTerm.length > 20 ? [{ id: searchTerm }] : []),
           ];
+          // Notice: userId has been completely removed from the OR array.
+        }
+
+        // 3. Filter by Date Range
+        if (startDate || endDate) {
+          where.createdAt = {};
+          if (startDate) {
+            where.createdAt.gte = new Date(
+              new Date(startDate).setHours(0, 0, 0, 0),
+            );
+          }
+          if (endDate) {
+            where.createdAt.lte = new Date(
+              new Date(endDate).setHours(23, 59, 59, 999),
+            );
+          }
+        }
+
+        // 4. Sorting
+        let orderBy = { createdAt: "desc" };
+        const validSortFields = ["id", "createdAt", "totalAmount", "status"];
+        if (sortBy && validSortFields.includes(sortBy)) {
+          const order =
+            sortOrder === "asc" || sortOrder === "desc" ? sortOrder : "desc";
+          orderBy = { [sortBy]: order };
         }
 
         const [orders, total] = await Promise.all([
@@ -459,7 +635,7 @@ export const getAllOrdersAdmin = async (req, res, next) => {
             where,
             skip,
             take: limit,
-            orderBy: { createdAt: "desc" },
+            orderBy,
             include: {
               items: true,
               history: { orderBy: { createdAt: "desc" }, take: 1 },
@@ -468,13 +644,11 @@ export const getAllOrdersAdmin = async (req, res, next) => {
           prisma.order.count({ where }),
         ]);
 
-        // Return an object containing BOTH results to cache them together
         return { orders, total };
       },
-      300, // TTL: 5 minutes. Admin data changes fast, so a short TTL absorbs traffic spikes without showing terribly stale data.
+      300,
     );
 
-    // 3. Destructure the result (whether it came from Redis or DB)
     const { orders, total } = cachedResult;
 
     res.status(200).json({
@@ -648,6 +822,39 @@ export const getInternalOrder = async (req, res, next) => {
     }
 
     res.status(200).json({ status: "success", data: order });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ==========================================
+// INTERNAL: GET USER ORDER STATS
+// ==========================================
+export const getInternalUserStats = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+
+    // Count only orders that have been successfully delivered
+    const deliveredCount = await prisma.order.count({
+      where: {
+        userId: userId,
+        status: "DELIVERED",
+      },
+    });
+
+    // You can also aggregate total spent here if needed in the future
+    const totalSpentAggregation = await prisma.order.aggregate({
+      _sum: { totalAmount: true },
+      where: { userId: userId, status: "DELIVERED" },
+    });
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        totalDelivered: deliveredCount,
+        totalSpent: totalSpentAggregation._sum.totalAmount || 0,
+      },
+    });
   } catch (error) {
     next(error);
   }

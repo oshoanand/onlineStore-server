@@ -16,13 +16,7 @@ enum Role {
     CUSTOMER
     ADMINISTRATOR
     SUPPORT
-
-    @@schema("shop_user")
-}
-
-enum SupportStatus {
-    PENDING
-    RESOLVED
+    COURIER
 
     @@schema("shop_user")
 }
@@ -31,6 +25,36 @@ enum UserStatus {
     ACTIVE
     INACTIVE
     BLOCKED
+
+    @@schema("shop_user")
+}
+
+enum TicketStatus {
+    OPEN
+    IN_PROGRESS
+    WAITING_ON_CUSTOMER
+    RESOLVED
+    CLOSED
+
+    @@schema("shop_user")
+}
+
+enum TicketPriority {
+    LOW
+    NORMAL
+    HIGH
+    URGENT
+
+    @@schema("shop_user")
+}
+
+enum TicketType {
+    BUG_REPORT
+    FEATURE_REQUEST
+    BILLING
+    TECHNICAL_SUPPORT
+    GENERAL_INQUIRY
+    OTHER
 
     @@schema("shop_user")
 }
@@ -48,12 +72,15 @@ model User {
     status        UserStatus @default(ACTIVE)
     fcmTokens     String[] // Array allows multiple devices (phone, web, tablet)
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    lastActiveAt DateTime? // Fallback for online/offline presence tracking
+    createdAt    DateTime  @default(now())
+    updatedAt    DateTime  @updatedAt
 
     // --- 1:1 Profile Relations ---
     customerProfile      CustomerProfile?
     administratorProfile AdministratorProfile?
+    courierProfile       CourierProfile?
+    supportProfile       SupportProfile?
 
     // --- Auth Relations (NextAuth Standard) ---
     accounts           Account[]
@@ -61,7 +88,7 @@ model User {
     verificationTokens VerificationToken[]
 
     // --- System Actions ---
-    supports        Support[]
+    supportTickets  SupportTicket[]  @relation("RequesterSupport")
     articles        Article[]
     articleComments ArticleComment[]
     articleLikes    ArticleLike[]
@@ -73,15 +100,15 @@ model User {
 // ADMINISTRATOR DOMAIN
 // ==========================================
 model AdministratorProfile {
-    id     String @id @default(uuid())
-    userId String @unique
-    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+    id       String @id @default(uuid())
+    userId   String @unique
+    user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
     fullName String
 
-    profilePhoto String?
-    department   String? // e.g., "Fulfillment", "Support", "SuperAdmin"
-    employeeId   String? @unique
+    profilePhoto   String?
+    department     String? // e.g., "Fulfillment", "Support", "SuperAdmin"
+    employeeId     String?         @unique
+    ticketsManaged SupportTicket[] @relation("ManagerSupport")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -101,6 +128,8 @@ model CustomerProfile {
     fullName     String
     profilePhoto String?
 
+    totalOrders Int @default(0)
+
     // Default Quick Address Info
     city        String?
     state       String?
@@ -110,6 +139,54 @@ model CustomerProfile {
     // Complex Relations
     addresses Address[]
     bankCards BankCard[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@schema("shop_user")
+}
+
+// ==========================================
+// COURIER DOMAIN
+// ==========================================
+model CourierProfile {
+    id     String @id @default(uuid())
+    userId String @unique
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    // Personal Info
+    fullName     String
+    profilePhoto String?
+
+    // Default Quick Address Info
+    city        String?
+    state       String?
+    pincode     String?
+    fullAddress String? @db.Text
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@schema("shop_user")
+}
+
+// ==========================================
+// SUPPORT DOMAIN
+// ==========================================
+model SupportProfile {
+    id     String @id @default(uuid())
+    userId String @unique
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    // Personal Info
+    fullName     String
+    profilePhoto String?
+
+    // Default Quick Address Info
+    city        String?
+    state       String?
+    pincode     String?
+    fullAddress String? @db.Text
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -214,23 +291,35 @@ model VerificationToken {
 // ==========================================
 // APP FEATURES (Support & Blog)
 // ==========================================
-model Support {
-    id         String @id @default(uuid())
-    postedById String
-    postedBy   User   @relation(fields: [postedById], references: [id]) // FIX: Changed from 'mobile' to 'id' for stability
+model SupportTicket {
+    id           String         @id @default(cuid())
+    ticketNumber Int            @unique @default(autoincrement())
+    subject      String
+    description  String         @db.Text
+    type         TicketType     @default(GENERAL_INQUIRY)
+    priority     TicketPriority @default(NORMAL)
+    status       TicketStatus   @default(OPEN)
+    attachments  String[]
 
-    mobile     String
-    queryType  String
-    message    String        @db.Text
-    photo      String?
-    status     SupportStatus @default(PENDING)
-    adminReply String?       @db.Text
+    requesterId   String?
+    contactMobile String?
+    contactEmail  String?
 
-    resolvedAt DateTime?
-    createdAt  DateTime  @default(now())
-    updatedAt  DateTime  @updatedAt
+    assignedManagerId String?
 
-    @@index([postedById])
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+    firstResponseAt DateTime?
+    resolvedAt      DateTime?
+    closedAt        DateTime?
+
+    requester       User?                 @relation("RequesterSupport", fields: [requesterId], references: [id], onDelete: SetNull)
+    assignedManager AdministratorProfile? @relation("ManagerSupport", fields: [assignedManagerId], references: [id], onDelete: SetNull)
+
+    @@index([status, priority])
+    @@index([createdAt])
+    @@index([requesterId])
+    @@index([assignedManagerId])
     @@schema("shop_user")
 }
 

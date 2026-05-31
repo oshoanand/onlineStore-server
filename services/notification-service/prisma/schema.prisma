@@ -1,6 +1,7 @@
 generator client {
-    provider        = "prisma-client"
-    output          = "../src/generated/prisma"
+    provider = "prisma-client"
+    output   = "../src/generated/prisma"
+
     previewFeatures = ["views"]
 }
 
@@ -18,7 +19,7 @@ model Notification {
     title     String
     message   String
     link      String?
-    type      String // e.g., 'ORDER_UPDATE', 'PROMOTION', 'SECURITY'
+    type      String
     isRead    Boolean  @default(false)
     createdAt DateTime @default(now())
 
@@ -28,37 +29,51 @@ model Notification {
 }
 
 // ==========================================
-// 2. ADVANCED REAL-TIME CHAT
+// 2. STATEFUL CHAT SESSIONS
 // ==========================================
-model ChatMessage {
-    id         String @id @default(uuid())
-    roomId     String // e.g., order_123 or user_456
-    senderId   String
-    senderRole String // "CUSTOMER" or "ADMINISTRATOR"
 
-    content String? @db.Text
-
-    // File Attachments (MinIO)
-    fileUrl  String?
-    fileName String?
-    fileType String?
-    fileSize Int?
-
-    // Message State
-    isRead    Boolean @default(false) // For the double blue checkmark
-    isDeleted Boolean @default(false) // Soft delete flag
-
+model ChatSession {
+    id        String   @id @default(uuid())
+    status    String   @default("OPEN")
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+    user1Id   String
+    user2Id   String
 
-    @@index([roomId])
-    @@index([createdAt])
+    // Relation back to the messages
+    messages ChatMessage[]
+
+    @@unique([user1Id, user2Id])
+    @@index([user1Id])
+    @@index([user2Id])
     @@schema("shop_notification")
 }
 
-// ==========================================
-// 3. USER PRESENCE (ONLINE/OFFLINE)
-// ==========================================
+model ChatMessage {
+    id       String  @id @default(cuid())
+    text     String? @db.Text
+    imageUrl String?
+
+    isRead    Boolean @default(false)
+    isDeleted Boolean @default(false)
+
+    readAt    DateTime?
+    createdAt DateTime  @default(now())
+
+    chatSessionId String
+    session       ChatSession @relation(fields: [chatSessionId], references: [id], onDelete: Cascade)
+
+    senderId String
+
+    replyToId String?
+    replyTo   ChatMessage?  @relation("MessageReplies", fields: [replyToId], references: [id])
+    replies   ChatMessage[] @relation("MessageReplies")
+
+    @@index([chatSessionId])
+    @@index([senderId])
+    @@schema("shop_notification")
+}
+
 model UserPresence {
     userId   String   @id
     isOnline Boolean  @default(false)

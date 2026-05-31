@@ -10,6 +10,7 @@ import {
   updateProduct,
   updateProductStatus,
   deleteProduct,
+  createMarketplaceClickEvent,
 } from "../controllers/product.js";
 import { createUploader, requireInternalAuth } from "@shop/utils";
 import { requireAdmin } from "../middlewares/authHeaders.js";
@@ -31,6 +32,7 @@ router.get("/internal/:id", requireInternalAuth, getProductById);
 router.get("/public/grouped", getGroupedProducts);
 // Advanced filtering, sorting, sentence search, and pagination
 router.get("/public/all", getPublicProducts);
+router.post("/public/analytics/marketplace-click", createMarketplaceClickEvent);
 // SEO-friendly product fetching by slug
 router.get("/public/slug/:slug", getPublicProductBySlug);
 // Cross-selling: Get related products based on categories

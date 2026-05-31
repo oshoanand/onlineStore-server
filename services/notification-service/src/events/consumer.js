@@ -46,6 +46,19 @@ const constructNotificationData = (payload) => {
         title: "Order Delivered ✅",
         message: `Your order #${getDisplayOrderId(payload.orderId)} has been successfully delivered. Enjoy your purchase!`,
       };
+
+    case "SUPPORT_TICKET_CREATED":
+      return {
+        type: "SUPPORT",
+        title: "We received your support message 🎉",
+        message: `Your support ticket #${payload.ticketId} has been created.`,
+      };
+    case "SUPPORT_TICKET_RESOLVED":
+      return {
+        type: "SUPPORT",
+        title: "Your Support Ticket Resolved ✅",
+        message: `Your support ticket #${payload.ticketId} has been resolved.`,
+      };
     case "PAYMENT_FAILED":
       return {
         type: "ALERT",
@@ -283,11 +296,23 @@ export const startNotificationConsumers = async () => {
         const userId = payload.userId || payload.data?.userId;
         if (!userId) return;
 
-        // Calculate Deep Link for UI redirection
+        // // Calculate Deep Link for UI redirection
+        // let deepLink = notifData.link || "/profile";
+        // if (payload.orderId) deepLink = `/orders/${payload.orderId}`;
+        // if (payload.eventType === "NEW_CHAT_MESSAGE")
+        //   deepLink = `/chat/${payload.roomId}`;
+
+        // 🚨 FIXED: Calculate Deep Link for UI redirection based on event context
         let deepLink = notifData.link || "/profile";
-        if (payload.orderId) deepLink = `/orders/${payload.orderId}`;
-        if (payload.eventType === "NEW_CHAT_MESSAGE")
+
+        if (payload.orderId) {
+          deepLink = `/profile/orders`;
+        } else if (payload.eventType === "NEW_CHAT_MESSAGE") {
           deepLink = `/chat/${payload.roomId}`;
+        } else if (payload.ticketId) {
+          // Directs the user to their specific support ticket tracking page
+          deepLink = `/support/tickets/${payload.ticketId}`;
+        }
 
         // 1. Save to Database
         const savedNotif = await prisma.notification.create({

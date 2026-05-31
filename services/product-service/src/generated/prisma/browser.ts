@@ -23,6 +23,11 @@ export * from './enums.ts';
  */
 export type Product = Prisma.ProductModel
 /**
+ * Model MarketplaceClick
+ * 
+ */
+export type MarketplaceClick = Prisma.MarketplaceClickModel
+/**
  * Model Category
  * 
  */

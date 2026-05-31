@@ -32,6 +32,7 @@ export type UserMinAggregateOutputType = {
   emailVerified: Date | null
   role: $Enums.Role | null
   status: $Enums.UserStatus | null
+  lastActiveAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -44,6 +45,7 @@ export type UserMaxAggregateOutputType = {
   emailVerified: Date | null
   role: $Enums.Role | null
   status: $Enums.UserStatus | null
+  lastActiveAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -57,6 +59,7 @@ export type UserCountAggregateOutputType = {
   role: number
   status: number
   fcmTokens: number
+  lastActiveAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -71,6 +74,7 @@ export type UserMinAggregateInputType = {
   emailVerified?: true
   role?: true
   status?: true
+  lastActiveAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -83,6 +87,7 @@ export type UserMaxAggregateInputType = {
   emailVerified?: true
   role?: true
   status?: true
+  lastActiveAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -96,6 +101,7 @@ export type UserCountAggregateInputType = {
   role?: true
   status?: true
   fcmTokens?: true
+  lastActiveAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -182,6 +188,7 @@ export type UserGroupByOutputType = {
   role: $Enums.Role
   status: $Enums.UserStatus
   fcmTokens: string[]
+  lastActiveAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: UserCountAggregateOutputType | null
@@ -216,14 +223,17 @@ export type UserWhereInput = {
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   status?: Prisma.EnumUserStatusFilter<"User"> | $Enums.UserStatus
   fcmTokens?: Prisma.StringNullableListFilter<"User">
+  lastActiveAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   customerProfile?: Prisma.XOR<Prisma.CustomerProfileNullableScalarRelationFilter, Prisma.CustomerProfileWhereInput> | null
   administratorProfile?: Prisma.XOR<Prisma.AdministratorProfileNullableScalarRelationFilter, Prisma.AdministratorProfileWhereInput> | null
+  courierProfile?: Prisma.XOR<Prisma.CourierProfileNullableScalarRelationFilter, Prisma.CourierProfileWhereInput> | null
+  supportProfile?: Prisma.XOR<Prisma.SupportProfileNullableScalarRelationFilter, Prisma.SupportProfileWhereInput> | null
   accounts?: Prisma.AccountListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
   verificationTokens?: Prisma.VerificationTokenListRelationFilter
-  supports?: Prisma.SupportListRelationFilter
+  supportTickets?: Prisma.SupportTicketListRelationFilter
   articles?: Prisma.ArticleListRelationFilter
   articleComments?: Prisma.ArticleCommentListRelationFilter
   articleLikes?: Prisma.ArticleLikeListRelationFilter
@@ -238,14 +248,17 @@ export type UserOrderByWithRelationInput = {
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   fcmTokens?: Prisma.SortOrder
+  lastActiveAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   customerProfile?: Prisma.CustomerProfileOrderByWithRelationInput
   administratorProfile?: Prisma.AdministratorProfileOrderByWithRelationInput
+  courierProfile?: Prisma.CourierProfileOrderByWithRelationInput
+  supportProfile?: Prisma.SupportProfileOrderByWithRelationInput
   accounts?: Prisma.AccountOrderByRelationAggregateInput
   sessions?: Prisma.SessionOrderByRelationAggregateInput
   verificationTokens?: Prisma.VerificationTokenOrderByRelationAggregateInput
-  supports?: Prisma.SupportOrderByRelationAggregateInput
+  supportTickets?: Prisma.SupportTicketOrderByRelationAggregateInput
   articles?: Prisma.ArticleOrderByRelationAggregateInput
   articleComments?: Prisma.ArticleCommentOrderByRelationAggregateInput
   articleLikes?: Prisma.ArticleLikeOrderByRelationAggregateInput
@@ -263,14 +276,17 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   status?: Prisma.EnumUserStatusFilter<"User"> | $Enums.UserStatus
   fcmTokens?: Prisma.StringNullableListFilter<"User">
+  lastActiveAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   customerProfile?: Prisma.XOR<Prisma.CustomerProfileNullableScalarRelationFilter, Prisma.CustomerProfileWhereInput> | null
   administratorProfile?: Prisma.XOR<Prisma.AdministratorProfileNullableScalarRelationFilter, Prisma.AdministratorProfileWhereInput> | null
+  courierProfile?: Prisma.XOR<Prisma.CourierProfileNullableScalarRelationFilter, Prisma.CourierProfileWhereInput> | null
+  supportProfile?: Prisma.XOR<Prisma.SupportProfileNullableScalarRelationFilter, Prisma.SupportProfileWhereInput> | null
   accounts?: Prisma.AccountListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
   verificationTokens?: Prisma.VerificationTokenListRelationFilter
-  supports?: Prisma.SupportListRelationFilter
+  supportTickets?: Prisma.SupportTicketListRelationFilter
   articles?: Prisma.ArticleListRelationFilter
   articleComments?: Prisma.ArticleCommentListRelationFilter
   articleLikes?: Prisma.ArticleLikeListRelationFilter
@@ -285,6 +301,7 @@ export type UserOrderByWithAggregationInput = {
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   fcmTokens?: Prisma.SortOrder
+  lastActiveAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
@@ -304,6 +321,7 @@ export type UserScalarWhereWithAggregatesInput = {
   role?: Prisma.EnumRoleWithAggregatesFilter<"User"> | $Enums.Role
   status?: Prisma.EnumUserStatusWithAggregatesFilter<"User"> | $Enums.UserStatus
   fcmTokens?: Prisma.StringNullableListFilter<"User">
+  lastActiveAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
 }
@@ -317,14 +335,17 @@ export type UserCreateInput = {
   role?: $Enums.Role
   status?: $Enums.UserStatus
   fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
+  lastActiveAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   customerProfile?: Prisma.CustomerProfileCreateNestedOneWithoutUserInput
   administratorProfile?: Prisma.AdministratorProfileCreateNestedOneWithoutUserInput
+  courierProfile?: Prisma.CourierProfileCreateNestedOneWithoutUserInput
+  supportProfile?: Prisma.SupportProfileCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   verificationTokens?: Prisma.VerificationTokenCreateNestedManyWithoutUserInput
-  supports?: Prisma.SupportCreateNestedManyWithoutPostedByInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutRequesterInput
   articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
   articleComments?: Prisma.ArticleCommentCreateNestedManyWithoutUserInput
   articleLikes?: Prisma.ArticleLikeCreateNestedManyWithoutUserInput
@@ -339,14 +360,17 @@ export type UserUncheckedCreateInput = {
   role?: $Enums.Role
   status?: $Enums.UserStatus
   fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
+  lastActiveAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   customerProfile?: Prisma.CustomerProfileUncheckedCreateNestedOneWithoutUserInput
   administratorProfile?: Prisma.AdministratorProfileUncheckedCreateNestedOneWithoutUserInput
+  courierProfile?: Prisma.CourierProfileUncheckedCreateNestedOneWithoutUserInput
+  supportProfile?: Prisma.SupportProfileUncheckedCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   verificationTokens?: Prisma.VerificationTokenUncheckedCreateNestedManyWithoutUserInput
-  supports?: Prisma.SupportUncheckedCreateNestedManyWithoutPostedByInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutRequesterInput
   articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
   articleComments?: Prisma.ArticleCommentUncheckedCreateNestedManyWithoutUserInput
   articleLikes?: Prisma.ArticleLikeUncheckedCreateNestedManyWithoutUserInput
@@ -361,14 +385,17 @@ export type UserUpdateInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   customerProfile?: Prisma.CustomerProfileUpdateOneWithoutUserNestedInput
   administratorProfile?: Prisma.AdministratorProfileUpdateOneWithoutUserNestedInput
+  courierProfile?: Prisma.CourierProfileUpdateOneWithoutUserNestedInput
+  supportProfile?: Prisma.SupportProfileUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   verificationTokens?: Prisma.VerificationTokenUpdateManyWithoutUserNestedInput
-  supports?: Prisma.SupportUpdateManyWithoutPostedByNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutRequesterNestedInput
   articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
   articleComments?: Prisma.ArticleCommentUpdateManyWithoutUserNestedInput
   articleLikes?: Prisma.ArticleLikeUpdateManyWithoutUserNestedInput
@@ -383,14 +410,17 @@ export type UserUncheckedUpdateInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   customerProfile?: Prisma.CustomerProfileUncheckedUpdateOneWithoutUserNestedInput
   administratorProfile?: Prisma.AdministratorProfileUncheckedUpdateOneWithoutUserNestedInput
+  courierProfile?: Prisma.CourierProfileUncheckedUpdateOneWithoutUserNestedInput
+  supportProfile?: Prisma.SupportProfileUncheckedUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   verificationTokens?: Prisma.VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
-  supports?: Prisma.SupportUncheckedUpdateManyWithoutPostedByNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutRequesterNestedInput
   articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
   articleComments?: Prisma.ArticleCommentUncheckedUpdateManyWithoutUserNestedInput
   articleLikes?: Prisma.ArticleLikeUncheckedUpdateManyWithoutUserNestedInput
@@ -405,6 +435,7 @@ export type UserCreateManyInput = {
   role?: $Enums.Role
   status?: $Enums.UserStatus
   fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
+  lastActiveAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -418,6 +449,7 @@ export type UserUpdateManyMutationInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -431,6 +463,7 @@ export type UserUncheckedUpdateManyInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -452,6 +485,7 @@ export type UserCountOrderByAggregateInput = {
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   fcmTokens?: Prisma.SortOrder
+  lastActiveAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -464,6 +498,7 @@ export type UserMaxOrderByAggregateInput = {
   emailVerified?: Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  lastActiveAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -476,6 +511,7 @@ export type UserMinOrderByAggregateInput = {
   emailVerified?: Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  lastActiveAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -523,6 +559,20 @@ export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
+export type UserCreateNestedOneWithoutAdministratorProfileInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAdministratorProfileInput, Prisma.UserUncheckedCreateWithoutAdministratorProfileInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAdministratorProfileInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutAdministratorProfileNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAdministratorProfileInput, Prisma.UserUncheckedCreateWithoutAdministratorProfileInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAdministratorProfileInput
+  upsert?: Prisma.UserUpsertWithoutAdministratorProfileInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAdministratorProfileInput, Prisma.UserUpdateWithoutAdministratorProfileInput>, Prisma.UserUncheckedUpdateWithoutAdministratorProfileInput>
+}
+
 export type UserCreateNestedOneWithoutCustomerProfileInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutCustomerProfileInput, Prisma.UserUncheckedCreateWithoutCustomerProfileInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutCustomerProfileInput
@@ -537,18 +587,32 @@ export type UserUpdateOneRequiredWithoutCustomerProfileNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCustomerProfileInput, Prisma.UserUpdateWithoutCustomerProfileInput>, Prisma.UserUncheckedUpdateWithoutCustomerProfileInput>
 }
 
-export type UserCreateNestedOneWithoutAdministratorProfileInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutAdministratorProfileInput, Prisma.UserUncheckedCreateWithoutAdministratorProfileInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAdministratorProfileInput
+export type UserCreateNestedOneWithoutCourierProfileInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCourierProfileInput, Prisma.UserUncheckedCreateWithoutCourierProfileInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCourierProfileInput
   connect?: Prisma.UserWhereUniqueInput
 }
 
-export type UserUpdateOneRequiredWithoutAdministratorProfileNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutAdministratorProfileInput, Prisma.UserUncheckedCreateWithoutAdministratorProfileInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAdministratorProfileInput
-  upsert?: Prisma.UserUpsertWithoutAdministratorProfileInput
+export type UserUpdateOneRequiredWithoutCourierProfileNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCourierProfileInput, Prisma.UserUncheckedCreateWithoutCourierProfileInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCourierProfileInput
+  upsert?: Prisma.UserUpsertWithoutCourierProfileInput
   connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAdministratorProfileInput, Prisma.UserUpdateWithoutAdministratorProfileInput>, Prisma.UserUncheckedUpdateWithoutAdministratorProfileInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCourierProfileInput, Prisma.UserUpdateWithoutCourierProfileInput>, Prisma.UserUncheckedUpdateWithoutCourierProfileInput>
+}
+
+export type UserCreateNestedOneWithoutSupportProfileInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSupportProfileInput, Prisma.UserUncheckedCreateWithoutSupportProfileInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSupportProfileInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSupportProfileNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSupportProfileInput, Prisma.UserUncheckedCreateWithoutSupportProfileInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSupportProfileInput
+  upsert?: Prisma.UserUpsertWithoutSupportProfileInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSupportProfileInput, Prisma.UserUpdateWithoutSupportProfileInput>, Prisma.UserUncheckedUpdateWithoutSupportProfileInput>
 }
 
 export type UserCreateNestedOneWithoutAccountsInput = {
@@ -595,18 +659,20 @@ export type UserUpdateOneWithoutVerificationTokensNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutVerificationTokensInput, Prisma.UserUpdateWithoutVerificationTokensInput>, Prisma.UserUncheckedUpdateWithoutVerificationTokensInput>
 }
 
-export type UserCreateNestedOneWithoutSupportsInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutSupportsInput, Prisma.UserUncheckedCreateWithoutSupportsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSupportsInput
+export type UserCreateNestedOneWithoutSupportTicketsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSupportTicketsInput, Prisma.UserUncheckedCreateWithoutSupportTicketsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSupportTicketsInput
   connect?: Prisma.UserWhereUniqueInput
 }
 
-export type UserUpdateOneRequiredWithoutSupportsNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutSupportsInput, Prisma.UserUncheckedCreateWithoutSupportsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSupportsInput
-  upsert?: Prisma.UserUpsertWithoutSupportsInput
+export type UserUpdateOneWithoutSupportTicketsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSupportTicketsInput, Prisma.UserUncheckedCreateWithoutSupportTicketsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSupportTicketsInput
+  upsert?: Prisma.UserUpsertWithoutSupportTicketsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
   connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSupportsInput, Prisma.UserUpdateWithoutSupportsInput>, Prisma.UserUncheckedUpdateWithoutSupportsInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSupportTicketsInput, Prisma.UserUpdateWithoutSupportTicketsInput>, Prisma.UserUncheckedUpdateWithoutSupportTicketsInput>
 }
 
 export type UserCreateNestedOneWithoutArticlesInput = {
@@ -651,106 +717,6 @@ export type UserUpdateOneRequiredWithoutArticleLikesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutArticleLikesInput, Prisma.UserUpdateWithoutArticleLikesInput>, Prisma.UserUncheckedUpdateWithoutArticleLikesInput>
 }
 
-export type UserCreateWithoutCustomerProfileInput = {
-  id?: string
-  email?: string | null
-  mobile: string
-  password: string
-  emailVerified?: Date | string | null
-  role?: $Enums.Role
-  status?: $Enums.UserStatus
-  fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  administratorProfile?: Prisma.AdministratorProfileCreateNestedOneWithoutUserInput
-  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  verificationTokens?: Prisma.VerificationTokenCreateNestedManyWithoutUserInput
-  supports?: Prisma.SupportCreateNestedManyWithoutPostedByInput
-  articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
-  articleComments?: Prisma.ArticleCommentCreateNestedManyWithoutUserInput
-  articleLikes?: Prisma.ArticleLikeCreateNestedManyWithoutUserInput
-}
-
-export type UserUncheckedCreateWithoutCustomerProfileInput = {
-  id?: string
-  email?: string | null
-  mobile: string
-  password: string
-  emailVerified?: Date | string | null
-  role?: $Enums.Role
-  status?: $Enums.UserStatus
-  fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  administratorProfile?: Prisma.AdministratorProfileUncheckedCreateNestedOneWithoutUserInput
-  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  verificationTokens?: Prisma.VerificationTokenUncheckedCreateNestedManyWithoutUserInput
-  supports?: Prisma.SupportUncheckedCreateNestedManyWithoutPostedByInput
-  articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
-  articleComments?: Prisma.ArticleCommentUncheckedCreateNestedManyWithoutUserInput
-  articleLikes?: Prisma.ArticleLikeUncheckedCreateNestedManyWithoutUserInput
-}
-
-export type UserCreateOrConnectWithoutCustomerProfileInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutCustomerProfileInput, Prisma.UserUncheckedCreateWithoutCustomerProfileInput>
-}
-
-export type UserUpsertWithoutCustomerProfileInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutCustomerProfileInput, Prisma.UserUncheckedUpdateWithoutCustomerProfileInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutCustomerProfileInput, Prisma.UserUncheckedCreateWithoutCustomerProfileInput>
-  where?: Prisma.UserWhereInput
-}
-
-export type UserUpdateToOneWithWhereWithoutCustomerProfileInput = {
-  where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutCustomerProfileInput, Prisma.UserUncheckedUpdateWithoutCustomerProfileInput>
-}
-
-export type UserUpdateWithoutCustomerProfileInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mobile?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
-  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
-  fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  administratorProfile?: Prisma.AdministratorProfileUpdateOneWithoutUserNestedInput
-  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  verificationTokens?: Prisma.VerificationTokenUpdateManyWithoutUserNestedInput
-  supports?: Prisma.SupportUpdateManyWithoutPostedByNestedInput
-  articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
-  articleComments?: Prisma.ArticleCommentUpdateManyWithoutUserNestedInput
-  articleLikes?: Prisma.ArticleLikeUpdateManyWithoutUserNestedInput
-}
-
-export type UserUncheckedUpdateWithoutCustomerProfileInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  mobile?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
-  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
-  fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  administratorProfile?: Prisma.AdministratorProfileUncheckedUpdateOneWithoutUserNestedInput
-  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  verificationTokens?: Prisma.VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
-  supports?: Prisma.SupportUncheckedUpdateManyWithoutPostedByNestedInput
-  articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
-  articleComments?: Prisma.ArticleCommentUncheckedUpdateManyWithoutUserNestedInput
-  articleLikes?: Prisma.ArticleLikeUncheckedUpdateManyWithoutUserNestedInput
-}
-
 export type UserCreateWithoutAdministratorProfileInput = {
   id?: string
   email?: string | null
@@ -760,13 +726,16 @@ export type UserCreateWithoutAdministratorProfileInput = {
   role?: $Enums.Role
   status?: $Enums.UserStatus
   fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
+  lastActiveAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   customerProfile?: Prisma.CustomerProfileCreateNestedOneWithoutUserInput
+  courierProfile?: Prisma.CourierProfileCreateNestedOneWithoutUserInput
+  supportProfile?: Prisma.SupportProfileCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   verificationTokens?: Prisma.VerificationTokenCreateNestedManyWithoutUserInput
-  supports?: Prisma.SupportCreateNestedManyWithoutPostedByInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutRequesterInput
   articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
   articleComments?: Prisma.ArticleCommentCreateNestedManyWithoutUserInput
   articleLikes?: Prisma.ArticleLikeCreateNestedManyWithoutUserInput
@@ -781,13 +750,16 @@ export type UserUncheckedCreateWithoutAdministratorProfileInput = {
   role?: $Enums.Role
   status?: $Enums.UserStatus
   fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
+  lastActiveAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   customerProfile?: Prisma.CustomerProfileUncheckedCreateNestedOneWithoutUserInput
+  courierProfile?: Prisma.CourierProfileUncheckedCreateNestedOneWithoutUserInput
+  supportProfile?: Prisma.SupportProfileUncheckedCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   verificationTokens?: Prisma.VerificationTokenUncheckedCreateNestedManyWithoutUserInput
-  supports?: Prisma.SupportUncheckedCreateNestedManyWithoutPostedByInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutRequesterInput
   articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
   articleComments?: Prisma.ArticleCommentUncheckedCreateNestedManyWithoutUserInput
   articleLikes?: Prisma.ArticleLikeUncheckedCreateNestedManyWithoutUserInput
@@ -818,13 +790,16 @@ export type UserUpdateWithoutAdministratorProfileInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   customerProfile?: Prisma.CustomerProfileUpdateOneWithoutUserNestedInput
+  courierProfile?: Prisma.CourierProfileUpdateOneWithoutUserNestedInput
+  supportProfile?: Prisma.SupportProfileUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   verificationTokens?: Prisma.VerificationTokenUpdateManyWithoutUserNestedInput
-  supports?: Prisma.SupportUpdateManyWithoutPostedByNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutRequesterNestedInput
   articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
   articleComments?: Prisma.ArticleCommentUpdateManyWithoutUserNestedInput
   articleLikes?: Prisma.ArticleLikeUpdateManyWithoutUserNestedInput
@@ -839,13 +814,352 @@ export type UserUncheckedUpdateWithoutAdministratorProfileInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   customerProfile?: Prisma.CustomerProfileUncheckedUpdateOneWithoutUserNestedInput
+  courierProfile?: Prisma.CourierProfileUncheckedUpdateOneWithoutUserNestedInput
+  supportProfile?: Prisma.SupportProfileUncheckedUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   verificationTokens?: Prisma.VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
-  supports?: Prisma.SupportUncheckedUpdateManyWithoutPostedByNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutRequesterNestedInput
+  articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
+  articleComments?: Prisma.ArticleCommentUncheckedUpdateManyWithoutUserNestedInput
+  articleLikes?: Prisma.ArticleLikeUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutCustomerProfileInput = {
+  id?: string
+  email?: string | null
+  mobile: string
+  password: string
+  emailVerified?: Date | string | null
+  role?: $Enums.Role
+  status?: $Enums.UserStatus
+  fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
+  lastActiveAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  administratorProfile?: Prisma.AdministratorProfileCreateNestedOneWithoutUserInput
+  courierProfile?: Prisma.CourierProfileCreateNestedOneWithoutUserInput
+  supportProfile?: Prisma.SupportProfileCreateNestedOneWithoutUserInput
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verificationTokens?: Prisma.VerificationTokenCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutRequesterInput
+  articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
+  articleComments?: Prisma.ArticleCommentCreateNestedManyWithoutUserInput
+  articleLikes?: Prisma.ArticleLikeCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutCustomerProfileInput = {
+  id?: string
+  email?: string | null
+  mobile: string
+  password: string
+  emailVerified?: Date | string | null
+  role?: $Enums.Role
+  status?: $Enums.UserStatus
+  fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
+  lastActiveAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  administratorProfile?: Prisma.AdministratorProfileUncheckedCreateNestedOneWithoutUserInput
+  courierProfile?: Prisma.CourierProfileUncheckedCreateNestedOneWithoutUserInput
+  supportProfile?: Prisma.SupportProfileUncheckedCreateNestedOneWithoutUserInput
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verificationTokens?: Prisma.VerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutRequesterInput
+  articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
+  articleComments?: Prisma.ArticleCommentUncheckedCreateNestedManyWithoutUserInput
+  articleLikes?: Prisma.ArticleLikeUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutCustomerProfileInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCustomerProfileInput, Prisma.UserUncheckedCreateWithoutCustomerProfileInput>
+}
+
+export type UserUpsertWithoutCustomerProfileInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCustomerProfileInput, Prisma.UserUncheckedUpdateWithoutCustomerProfileInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCustomerProfileInput, Prisma.UserUncheckedCreateWithoutCustomerProfileInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCustomerProfileInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCustomerProfileInput, Prisma.UserUncheckedUpdateWithoutCustomerProfileInput>
+}
+
+export type UserUpdateWithoutCustomerProfileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  administratorProfile?: Prisma.AdministratorProfileUpdateOneWithoutUserNestedInput
+  courierProfile?: Prisma.CourierProfileUpdateOneWithoutUserNestedInput
+  supportProfile?: Prisma.SupportProfileUpdateOneWithoutUserNestedInput
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verificationTokens?: Prisma.VerificationTokenUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutRequesterNestedInput
+  articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
+  articleComments?: Prisma.ArticleCommentUpdateManyWithoutUserNestedInput
+  articleLikes?: Prisma.ArticleLikeUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCustomerProfileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  administratorProfile?: Prisma.AdministratorProfileUncheckedUpdateOneWithoutUserNestedInput
+  courierProfile?: Prisma.CourierProfileUncheckedUpdateOneWithoutUserNestedInput
+  supportProfile?: Prisma.SupportProfileUncheckedUpdateOneWithoutUserNestedInput
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verificationTokens?: Prisma.VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutRequesterNestedInput
+  articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
+  articleComments?: Prisma.ArticleCommentUncheckedUpdateManyWithoutUserNestedInput
+  articleLikes?: Prisma.ArticleLikeUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutCourierProfileInput = {
+  id?: string
+  email?: string | null
+  mobile: string
+  password: string
+  emailVerified?: Date | string | null
+  role?: $Enums.Role
+  status?: $Enums.UserStatus
+  fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
+  lastActiveAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  customerProfile?: Prisma.CustomerProfileCreateNestedOneWithoutUserInput
+  administratorProfile?: Prisma.AdministratorProfileCreateNestedOneWithoutUserInput
+  supportProfile?: Prisma.SupportProfileCreateNestedOneWithoutUserInput
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verificationTokens?: Prisma.VerificationTokenCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutRequesterInput
+  articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
+  articleComments?: Prisma.ArticleCommentCreateNestedManyWithoutUserInput
+  articleLikes?: Prisma.ArticleLikeCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutCourierProfileInput = {
+  id?: string
+  email?: string | null
+  mobile: string
+  password: string
+  emailVerified?: Date | string | null
+  role?: $Enums.Role
+  status?: $Enums.UserStatus
+  fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
+  lastActiveAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  customerProfile?: Prisma.CustomerProfileUncheckedCreateNestedOneWithoutUserInput
+  administratorProfile?: Prisma.AdministratorProfileUncheckedCreateNestedOneWithoutUserInput
+  supportProfile?: Prisma.SupportProfileUncheckedCreateNestedOneWithoutUserInput
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verificationTokens?: Prisma.VerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutRequesterInput
+  articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
+  articleComments?: Prisma.ArticleCommentUncheckedCreateNestedManyWithoutUserInput
+  articleLikes?: Prisma.ArticleLikeUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutCourierProfileInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCourierProfileInput, Prisma.UserUncheckedCreateWithoutCourierProfileInput>
+}
+
+export type UserUpsertWithoutCourierProfileInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCourierProfileInput, Prisma.UserUncheckedUpdateWithoutCourierProfileInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCourierProfileInput, Prisma.UserUncheckedCreateWithoutCourierProfileInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCourierProfileInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCourierProfileInput, Prisma.UserUncheckedUpdateWithoutCourierProfileInput>
+}
+
+export type UserUpdateWithoutCourierProfileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  customerProfile?: Prisma.CustomerProfileUpdateOneWithoutUserNestedInput
+  administratorProfile?: Prisma.AdministratorProfileUpdateOneWithoutUserNestedInput
+  supportProfile?: Prisma.SupportProfileUpdateOneWithoutUserNestedInput
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verificationTokens?: Prisma.VerificationTokenUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutRequesterNestedInput
+  articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
+  articleComments?: Prisma.ArticleCommentUpdateManyWithoutUserNestedInput
+  articleLikes?: Prisma.ArticleLikeUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCourierProfileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  customerProfile?: Prisma.CustomerProfileUncheckedUpdateOneWithoutUserNestedInput
+  administratorProfile?: Prisma.AdministratorProfileUncheckedUpdateOneWithoutUserNestedInput
+  supportProfile?: Prisma.SupportProfileUncheckedUpdateOneWithoutUserNestedInput
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verificationTokens?: Prisma.VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutRequesterNestedInput
+  articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
+  articleComments?: Prisma.ArticleCommentUncheckedUpdateManyWithoutUserNestedInput
+  articleLikes?: Prisma.ArticleLikeUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutSupportProfileInput = {
+  id?: string
+  email?: string | null
+  mobile: string
+  password: string
+  emailVerified?: Date | string | null
+  role?: $Enums.Role
+  status?: $Enums.UserStatus
+  fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
+  lastActiveAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  customerProfile?: Prisma.CustomerProfileCreateNestedOneWithoutUserInput
+  administratorProfile?: Prisma.AdministratorProfileCreateNestedOneWithoutUserInput
+  courierProfile?: Prisma.CourierProfileCreateNestedOneWithoutUserInput
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  verificationTokens?: Prisma.VerificationTokenCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutRequesterInput
+  articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
+  articleComments?: Prisma.ArticleCommentCreateNestedManyWithoutUserInput
+  articleLikes?: Prisma.ArticleLikeCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutSupportProfileInput = {
+  id?: string
+  email?: string | null
+  mobile: string
+  password: string
+  emailVerified?: Date | string | null
+  role?: $Enums.Role
+  status?: $Enums.UserStatus
+  fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
+  lastActiveAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  customerProfile?: Prisma.CustomerProfileUncheckedCreateNestedOneWithoutUserInput
+  administratorProfile?: Prisma.AdministratorProfileUncheckedCreateNestedOneWithoutUserInput
+  courierProfile?: Prisma.CourierProfileUncheckedCreateNestedOneWithoutUserInput
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  verificationTokens?: Prisma.VerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutRequesterInput
+  articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
+  articleComments?: Prisma.ArticleCommentUncheckedCreateNestedManyWithoutUserInput
+  articleLikes?: Prisma.ArticleLikeUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutSupportProfileInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSupportProfileInput, Prisma.UserUncheckedCreateWithoutSupportProfileInput>
+}
+
+export type UserUpsertWithoutSupportProfileInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSupportProfileInput, Prisma.UserUncheckedUpdateWithoutSupportProfileInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSupportProfileInput, Prisma.UserUncheckedCreateWithoutSupportProfileInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSupportProfileInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSupportProfileInput, Prisma.UserUncheckedUpdateWithoutSupportProfileInput>
+}
+
+export type UserUpdateWithoutSupportProfileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  customerProfile?: Prisma.CustomerProfileUpdateOneWithoutUserNestedInput
+  administratorProfile?: Prisma.AdministratorProfileUpdateOneWithoutUserNestedInput
+  courierProfile?: Prisma.CourierProfileUpdateOneWithoutUserNestedInput
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  verificationTokens?: Prisma.VerificationTokenUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutRequesterNestedInput
+  articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
+  articleComments?: Prisma.ArticleCommentUpdateManyWithoutUserNestedInput
+  articleLikes?: Prisma.ArticleLikeUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSupportProfileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mobile?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  customerProfile?: Prisma.CustomerProfileUncheckedUpdateOneWithoutUserNestedInput
+  administratorProfile?: Prisma.AdministratorProfileUncheckedUpdateOneWithoutUserNestedInput
+  courierProfile?: Prisma.CourierProfileUncheckedUpdateOneWithoutUserNestedInput
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  verificationTokens?: Prisma.VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutRequesterNestedInput
   articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
   articleComments?: Prisma.ArticleCommentUncheckedUpdateManyWithoutUserNestedInput
   articleLikes?: Prisma.ArticleLikeUncheckedUpdateManyWithoutUserNestedInput
@@ -860,13 +1174,16 @@ export type UserCreateWithoutAccountsInput = {
   role?: $Enums.Role
   status?: $Enums.UserStatus
   fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
+  lastActiveAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   customerProfile?: Prisma.CustomerProfileCreateNestedOneWithoutUserInput
   administratorProfile?: Prisma.AdministratorProfileCreateNestedOneWithoutUserInput
+  courierProfile?: Prisma.CourierProfileCreateNestedOneWithoutUserInput
+  supportProfile?: Prisma.SupportProfileCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   verificationTokens?: Prisma.VerificationTokenCreateNestedManyWithoutUserInput
-  supports?: Prisma.SupportCreateNestedManyWithoutPostedByInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutRequesterInput
   articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
   articleComments?: Prisma.ArticleCommentCreateNestedManyWithoutUserInput
   articleLikes?: Prisma.ArticleLikeCreateNestedManyWithoutUserInput
@@ -881,13 +1198,16 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   role?: $Enums.Role
   status?: $Enums.UserStatus
   fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
+  lastActiveAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   customerProfile?: Prisma.CustomerProfileUncheckedCreateNestedOneWithoutUserInput
   administratorProfile?: Prisma.AdministratorProfileUncheckedCreateNestedOneWithoutUserInput
+  courierProfile?: Prisma.CourierProfileUncheckedCreateNestedOneWithoutUserInput
+  supportProfile?: Prisma.SupportProfileUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   verificationTokens?: Prisma.VerificationTokenUncheckedCreateNestedManyWithoutUserInput
-  supports?: Prisma.SupportUncheckedCreateNestedManyWithoutPostedByInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutRequesterInput
   articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
   articleComments?: Prisma.ArticleCommentUncheckedCreateNestedManyWithoutUserInput
   articleLikes?: Prisma.ArticleLikeUncheckedCreateNestedManyWithoutUserInput
@@ -918,13 +1238,16 @@ export type UserUpdateWithoutAccountsInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   customerProfile?: Prisma.CustomerProfileUpdateOneWithoutUserNestedInput
   administratorProfile?: Prisma.AdministratorProfileUpdateOneWithoutUserNestedInput
+  courierProfile?: Prisma.CourierProfileUpdateOneWithoutUserNestedInput
+  supportProfile?: Prisma.SupportProfileUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   verificationTokens?: Prisma.VerificationTokenUpdateManyWithoutUserNestedInput
-  supports?: Prisma.SupportUpdateManyWithoutPostedByNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutRequesterNestedInput
   articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
   articleComments?: Prisma.ArticleCommentUpdateManyWithoutUserNestedInput
   articleLikes?: Prisma.ArticleLikeUpdateManyWithoutUserNestedInput
@@ -939,13 +1262,16 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   customerProfile?: Prisma.CustomerProfileUncheckedUpdateOneWithoutUserNestedInput
   administratorProfile?: Prisma.AdministratorProfileUncheckedUpdateOneWithoutUserNestedInput
+  courierProfile?: Prisma.CourierProfileUncheckedUpdateOneWithoutUserNestedInput
+  supportProfile?: Prisma.SupportProfileUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   verificationTokens?: Prisma.VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
-  supports?: Prisma.SupportUncheckedUpdateManyWithoutPostedByNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutRequesterNestedInput
   articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
   articleComments?: Prisma.ArticleCommentUncheckedUpdateManyWithoutUserNestedInput
   articleLikes?: Prisma.ArticleLikeUncheckedUpdateManyWithoutUserNestedInput
@@ -960,13 +1286,16 @@ export type UserCreateWithoutSessionsInput = {
   role?: $Enums.Role
   status?: $Enums.UserStatus
   fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
+  lastActiveAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   customerProfile?: Prisma.CustomerProfileCreateNestedOneWithoutUserInput
   administratorProfile?: Prisma.AdministratorProfileCreateNestedOneWithoutUserInput
+  courierProfile?: Prisma.CourierProfileCreateNestedOneWithoutUserInput
+  supportProfile?: Prisma.SupportProfileCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   verificationTokens?: Prisma.VerificationTokenCreateNestedManyWithoutUserInput
-  supports?: Prisma.SupportCreateNestedManyWithoutPostedByInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutRequesterInput
   articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
   articleComments?: Prisma.ArticleCommentCreateNestedManyWithoutUserInput
   articleLikes?: Prisma.ArticleLikeCreateNestedManyWithoutUserInput
@@ -981,13 +1310,16 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   role?: $Enums.Role
   status?: $Enums.UserStatus
   fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
+  lastActiveAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   customerProfile?: Prisma.CustomerProfileUncheckedCreateNestedOneWithoutUserInput
   administratorProfile?: Prisma.AdministratorProfileUncheckedCreateNestedOneWithoutUserInput
+  courierProfile?: Prisma.CourierProfileUncheckedCreateNestedOneWithoutUserInput
+  supportProfile?: Prisma.SupportProfileUncheckedCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   verificationTokens?: Prisma.VerificationTokenUncheckedCreateNestedManyWithoutUserInput
-  supports?: Prisma.SupportUncheckedCreateNestedManyWithoutPostedByInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutRequesterInput
   articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
   articleComments?: Prisma.ArticleCommentUncheckedCreateNestedManyWithoutUserInput
   articleLikes?: Prisma.ArticleLikeUncheckedCreateNestedManyWithoutUserInput
@@ -1018,13 +1350,16 @@ export type UserUpdateWithoutSessionsInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   customerProfile?: Prisma.CustomerProfileUpdateOneWithoutUserNestedInput
   administratorProfile?: Prisma.AdministratorProfileUpdateOneWithoutUserNestedInput
+  courierProfile?: Prisma.CourierProfileUpdateOneWithoutUserNestedInput
+  supportProfile?: Prisma.SupportProfileUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   verificationTokens?: Prisma.VerificationTokenUpdateManyWithoutUserNestedInput
-  supports?: Prisma.SupportUpdateManyWithoutPostedByNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutRequesterNestedInput
   articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
   articleComments?: Prisma.ArticleCommentUpdateManyWithoutUserNestedInput
   articleLikes?: Prisma.ArticleLikeUpdateManyWithoutUserNestedInput
@@ -1039,13 +1374,16 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   customerProfile?: Prisma.CustomerProfileUncheckedUpdateOneWithoutUserNestedInput
   administratorProfile?: Prisma.AdministratorProfileUncheckedUpdateOneWithoutUserNestedInput
+  courierProfile?: Prisma.CourierProfileUncheckedUpdateOneWithoutUserNestedInput
+  supportProfile?: Prisma.SupportProfileUncheckedUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   verificationTokens?: Prisma.VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
-  supports?: Prisma.SupportUncheckedUpdateManyWithoutPostedByNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutRequesterNestedInput
   articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
   articleComments?: Prisma.ArticleCommentUncheckedUpdateManyWithoutUserNestedInput
   articleLikes?: Prisma.ArticleLikeUncheckedUpdateManyWithoutUserNestedInput
@@ -1060,13 +1398,16 @@ export type UserCreateWithoutVerificationTokensInput = {
   role?: $Enums.Role
   status?: $Enums.UserStatus
   fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
+  lastActiveAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   customerProfile?: Prisma.CustomerProfileCreateNestedOneWithoutUserInput
   administratorProfile?: Prisma.AdministratorProfileCreateNestedOneWithoutUserInput
+  courierProfile?: Prisma.CourierProfileCreateNestedOneWithoutUserInput
+  supportProfile?: Prisma.SupportProfileCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  supports?: Prisma.SupportCreateNestedManyWithoutPostedByInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutRequesterInput
   articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
   articleComments?: Prisma.ArticleCommentCreateNestedManyWithoutUserInput
   articleLikes?: Prisma.ArticleLikeCreateNestedManyWithoutUserInput
@@ -1081,13 +1422,16 @@ export type UserUncheckedCreateWithoutVerificationTokensInput = {
   role?: $Enums.Role
   status?: $Enums.UserStatus
   fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
+  lastActiveAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   customerProfile?: Prisma.CustomerProfileUncheckedCreateNestedOneWithoutUserInput
   administratorProfile?: Prisma.AdministratorProfileUncheckedCreateNestedOneWithoutUserInput
+  courierProfile?: Prisma.CourierProfileUncheckedCreateNestedOneWithoutUserInput
+  supportProfile?: Prisma.SupportProfileUncheckedCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  supports?: Prisma.SupportUncheckedCreateNestedManyWithoutPostedByInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutRequesterInput
   articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
   articleComments?: Prisma.ArticleCommentUncheckedCreateNestedManyWithoutUserInput
   articleLikes?: Prisma.ArticleLikeUncheckedCreateNestedManyWithoutUserInput
@@ -1118,13 +1462,16 @@ export type UserUpdateWithoutVerificationTokensInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   customerProfile?: Prisma.CustomerProfileUpdateOneWithoutUserNestedInput
   administratorProfile?: Prisma.AdministratorProfileUpdateOneWithoutUserNestedInput
+  courierProfile?: Prisma.CourierProfileUpdateOneWithoutUserNestedInput
+  supportProfile?: Prisma.SupportProfileUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  supports?: Prisma.SupportUpdateManyWithoutPostedByNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutRequesterNestedInput
   articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
   articleComments?: Prisma.ArticleCommentUpdateManyWithoutUserNestedInput
   articleLikes?: Prisma.ArticleLikeUpdateManyWithoutUserNestedInput
@@ -1139,19 +1486,22 @@ export type UserUncheckedUpdateWithoutVerificationTokensInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   customerProfile?: Prisma.CustomerProfileUncheckedUpdateOneWithoutUserNestedInput
   administratorProfile?: Prisma.AdministratorProfileUncheckedUpdateOneWithoutUserNestedInput
+  courierProfile?: Prisma.CourierProfileUncheckedUpdateOneWithoutUserNestedInput
+  supportProfile?: Prisma.SupportProfileUncheckedUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  supports?: Prisma.SupportUncheckedUpdateManyWithoutPostedByNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutRequesterNestedInput
   articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
   articleComments?: Prisma.ArticleCommentUncheckedUpdateManyWithoutUserNestedInput
   articleLikes?: Prisma.ArticleLikeUncheckedUpdateManyWithoutUserNestedInput
 }
 
-export type UserCreateWithoutSupportsInput = {
+export type UserCreateWithoutSupportTicketsInput = {
   id?: string
   email?: string | null
   mobile: string
@@ -1160,10 +1510,13 @@ export type UserCreateWithoutSupportsInput = {
   role?: $Enums.Role
   status?: $Enums.UserStatus
   fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
+  lastActiveAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   customerProfile?: Prisma.CustomerProfileCreateNestedOneWithoutUserInput
   administratorProfile?: Prisma.AdministratorProfileCreateNestedOneWithoutUserInput
+  courierProfile?: Prisma.CourierProfileCreateNestedOneWithoutUserInput
+  supportProfile?: Prisma.SupportProfileCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   verificationTokens?: Prisma.VerificationTokenCreateNestedManyWithoutUserInput
@@ -1172,7 +1525,7 @@ export type UserCreateWithoutSupportsInput = {
   articleLikes?: Prisma.ArticleLikeCreateNestedManyWithoutUserInput
 }
 
-export type UserUncheckedCreateWithoutSupportsInput = {
+export type UserUncheckedCreateWithoutSupportTicketsInput = {
   id?: string
   email?: string | null
   mobile: string
@@ -1181,10 +1534,13 @@ export type UserUncheckedCreateWithoutSupportsInput = {
   role?: $Enums.Role
   status?: $Enums.UserStatus
   fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
+  lastActiveAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   customerProfile?: Prisma.CustomerProfileUncheckedCreateNestedOneWithoutUserInput
   administratorProfile?: Prisma.AdministratorProfileUncheckedCreateNestedOneWithoutUserInput
+  courierProfile?: Prisma.CourierProfileUncheckedCreateNestedOneWithoutUserInput
+  supportProfile?: Prisma.SupportProfileUncheckedCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   verificationTokens?: Prisma.VerificationTokenUncheckedCreateNestedManyWithoutUserInput
@@ -1193,23 +1549,23 @@ export type UserUncheckedCreateWithoutSupportsInput = {
   articleLikes?: Prisma.ArticleLikeUncheckedCreateNestedManyWithoutUserInput
 }
 
-export type UserCreateOrConnectWithoutSupportsInput = {
+export type UserCreateOrConnectWithoutSupportTicketsInput = {
   where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutSupportsInput, Prisma.UserUncheckedCreateWithoutSupportsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSupportTicketsInput, Prisma.UserUncheckedCreateWithoutSupportTicketsInput>
 }
 
-export type UserUpsertWithoutSupportsInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutSupportsInput, Prisma.UserUncheckedUpdateWithoutSupportsInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutSupportsInput, Prisma.UserUncheckedCreateWithoutSupportsInput>
+export type UserUpsertWithoutSupportTicketsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSupportTicketsInput, Prisma.UserUncheckedUpdateWithoutSupportTicketsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSupportTicketsInput, Prisma.UserUncheckedCreateWithoutSupportTicketsInput>
   where?: Prisma.UserWhereInput
 }
 
-export type UserUpdateToOneWithWhereWithoutSupportsInput = {
+export type UserUpdateToOneWithWhereWithoutSupportTicketsInput = {
   where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutSupportsInput, Prisma.UserUncheckedUpdateWithoutSupportsInput>
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSupportTicketsInput, Prisma.UserUncheckedUpdateWithoutSupportTicketsInput>
 }
 
-export type UserUpdateWithoutSupportsInput = {
+export type UserUpdateWithoutSupportTicketsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mobile?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1218,10 +1574,13 @@ export type UserUpdateWithoutSupportsInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   customerProfile?: Prisma.CustomerProfileUpdateOneWithoutUserNestedInput
   administratorProfile?: Prisma.AdministratorProfileUpdateOneWithoutUserNestedInput
+  courierProfile?: Prisma.CourierProfileUpdateOneWithoutUserNestedInput
+  supportProfile?: Prisma.SupportProfileUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   verificationTokens?: Prisma.VerificationTokenUpdateManyWithoutUserNestedInput
@@ -1230,7 +1589,7 @@ export type UserUpdateWithoutSupportsInput = {
   articleLikes?: Prisma.ArticleLikeUpdateManyWithoutUserNestedInput
 }
 
-export type UserUncheckedUpdateWithoutSupportsInput = {
+export type UserUncheckedUpdateWithoutSupportTicketsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   mobile?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1239,10 +1598,13 @@ export type UserUncheckedUpdateWithoutSupportsInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   customerProfile?: Prisma.CustomerProfileUncheckedUpdateOneWithoutUserNestedInput
   administratorProfile?: Prisma.AdministratorProfileUncheckedUpdateOneWithoutUserNestedInput
+  courierProfile?: Prisma.CourierProfileUncheckedUpdateOneWithoutUserNestedInput
+  supportProfile?: Prisma.SupportProfileUncheckedUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   verificationTokens?: Prisma.VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -1260,14 +1622,17 @@ export type UserCreateWithoutArticlesInput = {
   role?: $Enums.Role
   status?: $Enums.UserStatus
   fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
+  lastActiveAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   customerProfile?: Prisma.CustomerProfileCreateNestedOneWithoutUserInput
   administratorProfile?: Prisma.AdministratorProfileCreateNestedOneWithoutUserInput
+  courierProfile?: Prisma.CourierProfileCreateNestedOneWithoutUserInput
+  supportProfile?: Prisma.SupportProfileCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   verificationTokens?: Prisma.VerificationTokenCreateNestedManyWithoutUserInput
-  supports?: Prisma.SupportCreateNestedManyWithoutPostedByInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutRequesterInput
   articleComments?: Prisma.ArticleCommentCreateNestedManyWithoutUserInput
   articleLikes?: Prisma.ArticleLikeCreateNestedManyWithoutUserInput
 }
@@ -1281,14 +1646,17 @@ export type UserUncheckedCreateWithoutArticlesInput = {
   role?: $Enums.Role
   status?: $Enums.UserStatus
   fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
+  lastActiveAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   customerProfile?: Prisma.CustomerProfileUncheckedCreateNestedOneWithoutUserInput
   administratorProfile?: Prisma.AdministratorProfileUncheckedCreateNestedOneWithoutUserInput
+  courierProfile?: Prisma.CourierProfileUncheckedCreateNestedOneWithoutUserInput
+  supportProfile?: Prisma.SupportProfileUncheckedCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   verificationTokens?: Prisma.VerificationTokenUncheckedCreateNestedManyWithoutUserInput
-  supports?: Prisma.SupportUncheckedCreateNestedManyWithoutPostedByInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutRequesterInput
   articleComments?: Prisma.ArticleCommentUncheckedCreateNestedManyWithoutUserInput
   articleLikes?: Prisma.ArticleLikeUncheckedCreateNestedManyWithoutUserInput
 }
@@ -1318,14 +1686,17 @@ export type UserUpdateWithoutArticlesInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   customerProfile?: Prisma.CustomerProfileUpdateOneWithoutUserNestedInput
   administratorProfile?: Prisma.AdministratorProfileUpdateOneWithoutUserNestedInput
+  courierProfile?: Prisma.CourierProfileUpdateOneWithoutUserNestedInput
+  supportProfile?: Prisma.SupportProfileUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   verificationTokens?: Prisma.VerificationTokenUpdateManyWithoutUserNestedInput
-  supports?: Prisma.SupportUpdateManyWithoutPostedByNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutRequesterNestedInput
   articleComments?: Prisma.ArticleCommentUpdateManyWithoutUserNestedInput
   articleLikes?: Prisma.ArticleLikeUpdateManyWithoutUserNestedInput
 }
@@ -1339,14 +1710,17 @@ export type UserUncheckedUpdateWithoutArticlesInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   customerProfile?: Prisma.CustomerProfileUncheckedUpdateOneWithoutUserNestedInput
   administratorProfile?: Prisma.AdministratorProfileUncheckedUpdateOneWithoutUserNestedInput
+  courierProfile?: Prisma.CourierProfileUncheckedUpdateOneWithoutUserNestedInput
+  supportProfile?: Prisma.SupportProfileUncheckedUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   verificationTokens?: Prisma.VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
-  supports?: Prisma.SupportUncheckedUpdateManyWithoutPostedByNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutRequesterNestedInput
   articleComments?: Prisma.ArticleCommentUncheckedUpdateManyWithoutUserNestedInput
   articleLikes?: Prisma.ArticleLikeUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -1360,14 +1734,17 @@ export type UserCreateWithoutArticleCommentsInput = {
   role?: $Enums.Role
   status?: $Enums.UserStatus
   fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
+  lastActiveAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   customerProfile?: Prisma.CustomerProfileCreateNestedOneWithoutUserInput
   administratorProfile?: Prisma.AdministratorProfileCreateNestedOneWithoutUserInput
+  courierProfile?: Prisma.CourierProfileCreateNestedOneWithoutUserInput
+  supportProfile?: Prisma.SupportProfileCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   verificationTokens?: Prisma.VerificationTokenCreateNestedManyWithoutUserInput
-  supports?: Prisma.SupportCreateNestedManyWithoutPostedByInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutRequesterInput
   articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
   articleLikes?: Prisma.ArticleLikeCreateNestedManyWithoutUserInput
 }
@@ -1381,14 +1758,17 @@ export type UserUncheckedCreateWithoutArticleCommentsInput = {
   role?: $Enums.Role
   status?: $Enums.UserStatus
   fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
+  lastActiveAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   customerProfile?: Prisma.CustomerProfileUncheckedCreateNestedOneWithoutUserInput
   administratorProfile?: Prisma.AdministratorProfileUncheckedCreateNestedOneWithoutUserInput
+  courierProfile?: Prisma.CourierProfileUncheckedCreateNestedOneWithoutUserInput
+  supportProfile?: Prisma.SupportProfileUncheckedCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   verificationTokens?: Prisma.VerificationTokenUncheckedCreateNestedManyWithoutUserInput
-  supports?: Prisma.SupportUncheckedCreateNestedManyWithoutPostedByInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutRequesterInput
   articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
   articleLikes?: Prisma.ArticleLikeUncheckedCreateNestedManyWithoutUserInput
 }
@@ -1418,14 +1798,17 @@ export type UserUpdateWithoutArticleCommentsInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   customerProfile?: Prisma.CustomerProfileUpdateOneWithoutUserNestedInput
   administratorProfile?: Prisma.AdministratorProfileUpdateOneWithoutUserNestedInput
+  courierProfile?: Prisma.CourierProfileUpdateOneWithoutUserNestedInput
+  supportProfile?: Prisma.SupportProfileUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   verificationTokens?: Prisma.VerificationTokenUpdateManyWithoutUserNestedInput
-  supports?: Prisma.SupportUpdateManyWithoutPostedByNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutRequesterNestedInput
   articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
   articleLikes?: Prisma.ArticleLikeUpdateManyWithoutUserNestedInput
 }
@@ -1439,14 +1822,17 @@ export type UserUncheckedUpdateWithoutArticleCommentsInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   customerProfile?: Prisma.CustomerProfileUncheckedUpdateOneWithoutUserNestedInput
   administratorProfile?: Prisma.AdministratorProfileUncheckedUpdateOneWithoutUserNestedInput
+  courierProfile?: Prisma.CourierProfileUncheckedUpdateOneWithoutUserNestedInput
+  supportProfile?: Prisma.SupportProfileUncheckedUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   verificationTokens?: Prisma.VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
-  supports?: Prisma.SupportUncheckedUpdateManyWithoutPostedByNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutRequesterNestedInput
   articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
   articleLikes?: Prisma.ArticleLikeUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -1460,14 +1846,17 @@ export type UserCreateWithoutArticleLikesInput = {
   role?: $Enums.Role
   status?: $Enums.UserStatus
   fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
+  lastActiveAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   customerProfile?: Prisma.CustomerProfileCreateNestedOneWithoutUserInput
   administratorProfile?: Prisma.AdministratorProfileCreateNestedOneWithoutUserInput
+  courierProfile?: Prisma.CourierProfileCreateNestedOneWithoutUserInput
+  supportProfile?: Prisma.SupportProfileCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   verificationTokens?: Prisma.VerificationTokenCreateNestedManyWithoutUserInput
-  supports?: Prisma.SupportCreateNestedManyWithoutPostedByInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutRequesterInput
   articles?: Prisma.ArticleCreateNestedManyWithoutAuthorInput
   articleComments?: Prisma.ArticleCommentCreateNestedManyWithoutUserInput
 }
@@ -1481,14 +1870,17 @@ export type UserUncheckedCreateWithoutArticleLikesInput = {
   role?: $Enums.Role
   status?: $Enums.UserStatus
   fcmTokens?: Prisma.UserCreatefcmTokensInput | string[]
+  lastActiveAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   customerProfile?: Prisma.CustomerProfileUncheckedCreateNestedOneWithoutUserInput
   administratorProfile?: Prisma.AdministratorProfileUncheckedCreateNestedOneWithoutUserInput
+  courierProfile?: Prisma.CourierProfileUncheckedCreateNestedOneWithoutUserInput
+  supportProfile?: Prisma.SupportProfileUncheckedCreateNestedOneWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   verificationTokens?: Prisma.VerificationTokenUncheckedCreateNestedManyWithoutUserInput
-  supports?: Prisma.SupportUncheckedCreateNestedManyWithoutPostedByInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutRequesterInput
   articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAuthorInput
   articleComments?: Prisma.ArticleCommentUncheckedCreateNestedManyWithoutUserInput
 }
@@ -1518,14 +1910,17 @@ export type UserUpdateWithoutArticleLikesInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   customerProfile?: Prisma.CustomerProfileUpdateOneWithoutUserNestedInput
   administratorProfile?: Prisma.AdministratorProfileUpdateOneWithoutUserNestedInput
+  courierProfile?: Prisma.CourierProfileUpdateOneWithoutUserNestedInput
+  supportProfile?: Prisma.SupportProfileUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   verificationTokens?: Prisma.VerificationTokenUpdateManyWithoutUserNestedInput
-  supports?: Prisma.SupportUpdateManyWithoutPostedByNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutRequesterNestedInput
   articles?: Prisma.ArticleUpdateManyWithoutAuthorNestedInput
   articleComments?: Prisma.ArticleCommentUpdateManyWithoutUserNestedInput
 }
@@ -1539,14 +1934,17 @@ export type UserUncheckedUpdateWithoutArticleLikesInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   fcmTokens?: Prisma.UserUpdatefcmTokensInput | string[]
+  lastActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   customerProfile?: Prisma.CustomerProfileUncheckedUpdateOneWithoutUserNestedInput
   administratorProfile?: Prisma.AdministratorProfileUncheckedUpdateOneWithoutUserNestedInput
+  courierProfile?: Prisma.CourierProfileUncheckedUpdateOneWithoutUserNestedInput
+  supportProfile?: Prisma.SupportProfileUncheckedUpdateOneWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   verificationTokens?: Prisma.VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
-  supports?: Prisma.SupportUncheckedUpdateManyWithoutPostedByNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutRequesterNestedInput
   articles?: Prisma.ArticleUncheckedUpdateManyWithoutAuthorNestedInput
   articleComments?: Prisma.ArticleCommentUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -1560,7 +1958,7 @@ export type UserCountOutputType = {
   accounts: number
   sessions: number
   verificationTokens: number
-  supports: number
+  supportTickets: number
   articles: number
   articleComments: number
   articleLikes: number
@@ -1570,7 +1968,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   accounts?: boolean | UserCountOutputTypeCountAccountsArgs
   sessions?: boolean | UserCountOutputTypeCountSessionsArgs
   verificationTokens?: boolean | UserCountOutputTypeCountVerificationTokensArgs
-  supports?: boolean | UserCountOutputTypeCountSupportsArgs
+  supportTickets?: boolean | UserCountOutputTypeCountSupportTicketsArgs
   articles?: boolean | UserCountOutputTypeCountArticlesArgs
   articleComments?: boolean | UserCountOutputTypeCountArticleCommentsArgs
   articleLikes?: boolean | UserCountOutputTypeCountArticleLikesArgs
@@ -1610,8 +2008,8 @@ export type UserCountOutputTypeCountVerificationTokensArgs<ExtArgs extends runti
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountSupportsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.SupportWhereInput
+export type UserCountOutputTypeCountSupportTicketsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SupportTicketWhereInput
 }
 
 /**
@@ -1645,14 +2043,17 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   role?: boolean
   status?: boolean
   fcmTokens?: boolean
+  lastActiveAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   customerProfile?: boolean | Prisma.User$customerProfileArgs<ExtArgs>
   administratorProfile?: boolean | Prisma.User$administratorProfileArgs<ExtArgs>
+  courierProfile?: boolean | Prisma.User$courierProfileArgs<ExtArgs>
+  supportProfile?: boolean | Prisma.User$supportProfileArgs<ExtArgs>
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   verificationTokens?: boolean | Prisma.User$verificationTokensArgs<ExtArgs>
-  supports?: boolean | Prisma.User$supportsArgs<ExtArgs>
+  supportTickets?: boolean | Prisma.User$supportTicketsArgs<ExtArgs>
   articles?: boolean | Prisma.User$articlesArgs<ExtArgs>
   articleComments?: boolean | Prisma.User$articleCommentsArgs<ExtArgs>
   articleLikes?: boolean | Prisma.User$articleLikesArgs<ExtArgs>
@@ -1668,6 +2069,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   role?: boolean
   status?: boolean
   fcmTokens?: boolean
+  lastActiveAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -1681,6 +2083,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   role?: boolean
   status?: boolean
   fcmTokens?: boolean
+  lastActiveAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -1694,18 +2097,21 @@ export type UserSelectScalar = {
   role?: boolean
   status?: boolean
   fcmTokens?: boolean
+  lastActiveAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "mobile" | "password" | "emailVerified" | "role" | "status" | "fcmTokens" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "mobile" | "password" | "emailVerified" | "role" | "status" | "fcmTokens" | "lastActiveAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   customerProfile?: boolean | Prisma.User$customerProfileArgs<ExtArgs>
   administratorProfile?: boolean | Prisma.User$administratorProfileArgs<ExtArgs>
+  courierProfile?: boolean | Prisma.User$courierProfileArgs<ExtArgs>
+  supportProfile?: boolean | Prisma.User$supportProfileArgs<ExtArgs>
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   verificationTokens?: boolean | Prisma.User$verificationTokensArgs<ExtArgs>
-  supports?: boolean | Prisma.User$supportsArgs<ExtArgs>
+  supportTickets?: boolean | Prisma.User$supportTicketsArgs<ExtArgs>
   articles?: boolean | Prisma.User$articlesArgs<ExtArgs>
   articleComments?: boolean | Prisma.User$articleCommentsArgs<ExtArgs>
   articleLikes?: boolean | Prisma.User$articleLikesArgs<ExtArgs>
@@ -1719,10 +2125,12 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   objects: {
     customerProfile: Prisma.$CustomerProfilePayload<ExtArgs> | null
     administratorProfile: Prisma.$AdministratorProfilePayload<ExtArgs> | null
+    courierProfile: Prisma.$CourierProfilePayload<ExtArgs> | null
+    supportProfile: Prisma.$SupportProfilePayload<ExtArgs> | null
     accounts: Prisma.$AccountPayload<ExtArgs>[]
     sessions: Prisma.$SessionPayload<ExtArgs>[]
     verificationTokens: Prisma.$VerificationTokenPayload<ExtArgs>[]
-    supports: Prisma.$SupportPayload<ExtArgs>[]
+    supportTickets: Prisma.$SupportTicketPayload<ExtArgs>[]
     articles: Prisma.$ArticlePayload<ExtArgs>[]
     articleComments: Prisma.$ArticleCommentPayload<ExtArgs>[]
     articleLikes: Prisma.$ArticleLikePayload<ExtArgs>[]
@@ -1736,6 +2144,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     role: $Enums.Role
     status: $Enums.UserStatus
     fcmTokens: string[]
+    lastActiveAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["user"]>
@@ -2134,10 +2543,12 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   customerProfile<T extends Prisma.User$customerProfileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$customerProfileArgs<ExtArgs>>): Prisma.Prisma__CustomerProfileClient<runtime.Types.Result.GetResult<Prisma.$CustomerProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   administratorProfile<T extends Prisma.User$administratorProfileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$administratorProfileArgs<ExtArgs>>): Prisma.Prisma__AdministratorProfileClient<runtime.Types.Result.GetResult<Prisma.$AdministratorProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  courierProfile<T extends Prisma.User$courierProfileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$courierProfileArgs<ExtArgs>>): Prisma.Prisma__CourierProfileClient<runtime.Types.Result.GetResult<Prisma.$CourierProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  supportProfile<T extends Prisma.User$supportProfileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$supportProfileArgs<ExtArgs>>): Prisma.Prisma__SupportProfileClient<runtime.Types.Result.GetResult<Prisma.$SupportProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   accounts<T extends Prisma.User$accountsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   verificationTokens<T extends Prisma.User$verificationTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$verificationTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VerificationTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  supports<T extends Prisma.User$supportsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$supportsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  supportTickets<T extends Prisma.User$supportTicketsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$supportTicketsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportTicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   articles<T extends Prisma.User$articlesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$articlesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ArticlePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   articleComments<T extends Prisma.User$articleCommentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$articleCommentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ArticleCommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   articleLikes<T extends Prisma.User$articleLikesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$articleLikesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ArticleLikePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2178,6 +2589,7 @@ export interface UserFieldRefs {
   readonly role: Prisma.FieldRef<"User", 'Role'>
   readonly status: Prisma.FieldRef<"User", 'UserStatus'>
   readonly fcmTokens: Prisma.FieldRef<"User", 'String[]'>
+  readonly lastActiveAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
 }
@@ -2611,6 +3023,44 @@ export type User$administratorProfileArgs<ExtArgs extends runtime.Types.Extensio
 }
 
 /**
+ * User.courierProfile
+ */
+export type User$courierProfileArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CourierProfile
+   */
+  select?: Prisma.CourierProfileSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CourierProfile
+   */
+  omit?: Prisma.CourierProfileOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CourierProfileInclude<ExtArgs> | null
+  where?: Prisma.CourierProfileWhereInput
+}
+
+/**
+ * User.supportProfile
+ */
+export type User$supportProfileArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SupportProfile
+   */
+  select?: Prisma.SupportProfileSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SupportProfile
+   */
+  omit?: Prisma.SupportProfileOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SupportProfileInclude<ExtArgs> | null
+  where?: Prisma.SupportProfileWhereInput
+}
+
+/**
  * User.accounts
  */
 export type User$accountsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2683,27 +3133,27 @@ export type User$verificationTokensArgs<ExtArgs extends runtime.Types.Extensions
 }
 
 /**
- * User.supports
+ * User.supportTickets
  */
-export type User$supportsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$supportTicketsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the Support
+   * Select specific fields to fetch from the SupportTicket
    */
-  select?: Prisma.SupportSelect<ExtArgs> | null
+  select?: Prisma.SupportTicketSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the Support
+   * Omit specific fields from the SupportTicket
    */
-  omit?: Prisma.SupportOmit<ExtArgs> | null
+  omit?: Prisma.SupportTicketOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.SupportInclude<ExtArgs> | null
-  where?: Prisma.SupportWhereInput
-  orderBy?: Prisma.SupportOrderByWithRelationInput | Prisma.SupportOrderByWithRelationInput[]
-  cursor?: Prisma.SupportWhereUniqueInput
+  include?: Prisma.SupportTicketInclude<ExtArgs> | null
+  where?: Prisma.SupportTicketWhereInput
+  orderBy?: Prisma.SupportTicketOrderByWithRelationInput | Prisma.SupportTicketOrderByWithRelationInput[]
+  cursor?: Prisma.SupportTicketWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.SupportScalarFieldEnum | Prisma.SupportScalarFieldEnum[]
+  distinct?: Prisma.SupportTicketScalarFieldEnum | Prisma.SupportTicketScalarFieldEnum[]
 }
 
 /**

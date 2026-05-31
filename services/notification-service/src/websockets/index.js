@@ -1,198 +1,7 @@
-// import { Server } from "socket.io";
-// import { createAdapter } from "@socket.io/redis-adapter";
-// import jwt from "jsonwebtoken";
-// import { logger } from "@shop/utils";
-// import crypto from "crypto";
-// import prisma from "../config/prisma.js";
-// import {
-//   pubClient,
-//   subClient,
-//   redisClient,
-// } from "@shop/event-bus/src/redis.js";
-
-// let ioInstance;
-
-// export const initWebSocketServer = (server) => {
-//   const io = new Server(server, {
-//     cors: { origin: "*", methods: ["GET", "POST"] },
-//     // Ensure this matches exactly what the frontend requests
-//     // path: "/api/notifications/socket.io",
-//     path: "/socket.io",
-//     // Best practice for dropping ghost connections
-//     pingTimeout: 60000,
-//     pingInterval: 25000,
-//   });
-
-//   // Attach Redis Adapter for Horizontal Scaling
-//   io.adapter(createAdapter(pubClient, subClient));
-
-//   // ==========================================
-//   // MIDDLEWARE: Authentication
-//   // ==========================================
-//   io.use((socket, next) => {
-//     const token = socket.handshake.auth?.token || socket.handshake.query?.token;
-
-//     if (!token) {
-//       return next(new Error("Unauthorized: No token provided"));
-//     }
-
-//     try {
-//       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-//       socket.user = decoded;
-//       next();
-//     } catch (err) {
-//       logger.error(`[WebSocket] Token verification failed: ${err.message}`);
-//       next(new Error("Unauthorized: Invalid token"));
-//     }
-//   });
-
-//   // ==========================================
-//   // CONNECTION HANDLING
-//   // ==========================================
-//   io.on("connection", async (socket) => {
-//     const userId = socket.user.id;
-//     logger.info(
-//       `[WebSocket] User ${userId} connected. Socket ID: ${socket.id}`,
-//     );
-
-//     // 1. JOIN PERSONAL ROOM
-//     socket.join(userId);
-
-//     // 2. MARK USER ONLINE
-//     try {
-//       await prisma.userPresence.upsert({
-//         where: { userId },
-//         update: { isOnline: true, lastSeen: new Date() },
-//         create: { userId, isOnline: true },
-//       });
-//       io.emit("user_status_change", { userId, isOnline: true });
-//     } catch (err) {
-//       logger.error(`[WebSocket] Presence update failed: ${err.message}`);
-//     }
-
-//     socket.emit("system_alert", {
-//       type: "CONNECTED",
-//       message: "Real-time notifications & chat active",
-//     });
-
-//     // ==========================================
-//     // CHAT FUNCTIONALITY
-//     // ==========================================
-//     socket.on("join_chat_room", (roomId) => {
-//       socket.join(roomId);
-//       logger.info(`[Chat] User ${userId} joined room ${roomId}`);
-//     });
-
-//     socket.on("typing", ({ roomId }) => {
-//       socket.to(roomId).emit("user_typing", { userId, isTyping: true });
-//     });
-
-//     socket.on("stop_typing", ({ roomId }) => {
-//       socket.to(roomId).emit("user_typing", { userId, isTyping: false });
-//     });
-
-//     socket.on("send_message", async (data, callback) => {
-//       try {
-//         const messagePayload = {
-//           id: crypto.randomUUID(),
-//           roomId: data.roomId,
-//           senderId: userId,
-//           senderRole: socket.user.role || "USER",
-//           content: data.content || null,
-//           fileUrl: data.fileUrl || null,
-//           fileName: data.fileName || null,
-//           fileType: data.fileType || null,
-//           isDeleted: false,
-//           isRead: false,
-//           timestamp: new Date().toISOString(),
-//         };
-
-//         // Broadcast to everyone in the chat room (including sender)
-//         io.to(data.roomId).emit("receive_message", messagePayload);
-
-//         // Offload DB Save to Redis Streams
-//         await redisClient.xadd(
-//           "stream:chat_messages",
-//           "*",
-//           "payload",
-//           JSON.stringify(messagePayload),
-//         );
-
-//         if (typeof callback === "function") {
-//           callback({ status: "sent", id: messagePayload.id });
-//         }
-//       } catch (err) {
-//         logger.error(`[Chat] Send message failed: ${err.message}`);
-//       }
-//     });
-
-//     socket.on("delete_message", async ({ messageId, roomId }) => {
-//       io.to(roomId).emit("message_deleted", { messageId });
-//       try {
-//         await prisma.chatMessage.update({
-//           where: { id: messageId },
-//           data: { isDeleted: true },
-//         });
-//       } catch (err) {
-//         logger.error(`[Chat] Delete failed: ${err.message}`);
-//       }
-//     });
-
-//     socket.on("mark_messages_read", async ({ messageIds, roomId }) => {
-//       io.to(roomId).emit("messages_read", { messageIds, readBy: userId });
-//       try {
-//         await prisma.chatMessage.updateMany({
-//           where: { id: { in: messageIds } },
-//           data: { isRead: true },
-//         });
-//       } catch (err) {
-//         logger.error(`[Chat] Read receipt update failed: ${err.message}`);
-//       }
-//     });
-
-//     // ==========================================
-//     // DISCONNECT HANDLING
-//     // ==========================================
-//     socket.on("disconnect", async () => {
-//       logger.info(
-//         `[WebSocket] User ${userId} disconnected. Socket ID: ${socket.id}`,
-//       );
-//       try {
-//         // Only mark offline if they closed ALL their tabs/devices
-//         const activeTabs = await io.in(userId).fetchSockets();
-//         if (activeTabs.length === 0) {
-//           await prisma.userPresence.update({
-//             where: { userId },
-//             data: { isOnline: false, lastSeen: new Date() },
-//           });
-//           io.emit("user_status_change", {
-//             userId,
-//             isOnline: false,
-//             lastSeen: new Date(),
-//           });
-//         }
-//       } catch (err) {
-//         logger.error(`[WebSocket] Presence disconnect failed: ${err.message}`);
-//       }
-//     });
-//   });
-
-//   ioInstance = io;
-//   return io;
-// };
-
-// export const pushToUserWebsocket = (userId, payload) => {
-//   if (ioInstance) {
-//     ioInstance.to(userId).emit("new_notification", payload);
-//   } else {
-//     logger.warn("[WebSocket] ioInstance not initialized.");
-//   }
-// };
 import { Server } from "socket.io";
 import { createAdapter } from "@socket.io/redis-adapter";
 import jwt from "jsonwebtoken";
 import { logger } from "@shop/utils";
-import crypto from "crypto";
 import prisma from "../config/prisma.js";
 import {
   pubClient,
@@ -204,9 +13,11 @@ let ioInstance;
 
 export const initWebSocketServer = (server) => {
   const io = new Server(server, {
-    cors: { origin: "*", methods: ["GET", "POST"] },
-    // 🚨 CRITICAL FIX: Ensure this matches EXACTLY what the frontend requests
-    // and what the Gateway proxies without rewriting
+    cors: {
+      origin: "*",
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      credentials: true,
+    },
     path: "/api/notifications/socket.io",
     pingTimeout: 60000,
     pingInterval: 25000,
@@ -214,141 +25,294 @@ export const initWebSocketServer = (server) => {
 
   io.adapter(createAdapter(pubClient, subClient));
 
+  // ==========================================
+  // MIDDLEWARE: SECURE JWT AUTHENTICATION
+  // ==========================================
   io.use((socket, next) => {
-    const token = socket.handshake.auth?.token || socket.handshake.query?.token;
+    // 🚨 Extract the JWT token sent by the frontend
+    const token = socket.handshake.auth?.token;
 
     if (!token) {
-      return next(new Error("Unauthorized: No token provided"));
+      return next(new Error("Authentication error: Token required"));
     }
 
     try {
+      // 🚨 Cryptographically verify the token using your NextAuth secret
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      socket.user = decoded;
+
+      // Attach the trusted user ID to the socket
+      socket.userId = decoded.id.toString();
+      socket.userRole = decoded.role;
+
+      console.log(
+        `✅ Socket authenticated: User ${socket.userId} (Role: ${socket.userRole})`,
+      );
+
       next();
-    } catch (err) {
-      logger.error(`[WebSocket] Token verification failed: ${err.message}`);
-      next(new Error("Unauthorized: Invalid token"));
+    } catch (error) {
+      logger.error(`Socket auth failed: ${error.message}`);
+      return next(new Error("Authentication error: Invalid or expired token"));
     }
   });
 
+  // ==========================================
+  // CONNECTION HANDLER
+  // ==========================================
   io.on("connection", async (socket) => {
-    const userId = socket.user.id;
-    logger.info(
-      `[WebSocket] User ${userId} connected. Socket ID: ${socket.id}`,
-    );
+    const userId = socket.userId;
+    logger.info(`🔌 Client Connected: ${userId} (Socket: ${socket.id})`);
 
-    socket.join(userId);
+    // 1. Join a personal room for targeted cross-device sync
+    const personalRoom = `user_${userId}`;
+    socket.join(personalRoom);
 
+    // 🟢 PRESENCE: USER ONLINE
     try {
-      await prisma.userPresence.upsert({
-        where: { userId },
-        update: { isOnline: true, lastSeen: new Date() },
-        create: { userId, isOnline: true },
+      // Add user to global Redis set
+      await redisClient.sadd("online_users", userId);
+      // Clear any previous last_seen timestamp
+      await redisClient.del(`last_seen:${userId}`);
+
+      // Broadcast to all clients that this user is online
+      io.emit("user_status_changed", {
+        userId: userId,
+        isOnline: true,
+        lastSeen: null,
       });
-      io.emit("user_status_change", { userId, isOnline: true });
-    } catch (err) {
-      logger.error(`[WebSocket] Presence update failed: ${err.message}`);
+
+      // Send the connecting user the current list of online users
+      const onlineUsers = await redisClient.smembers("online_users");
+      socket.emit("online_users_list", onlineUsers);
+    } catch (error) {
+      console.error("❌ Redis Error during presence update:", error);
     }
 
-    socket.emit("system_alert", {
-      type: "CONNECTED",
-      message: "Real-time notifications & chat active",
-    });
-
     // ==========================================
-    // CHAT FUNCTIONALITY
+    // 💬 CHAT: SEND MESSAGE
     // ==========================================
-    socket.on("join_chat_room", (roomId) => {
-      socket.join(roomId);
-      logger.info(`[Chat] User ${userId} joined room ${roomId}`);
-    });
+    socket.on("send_message", async (data) => {
+      // Safely parse data (clients sometimes send strings instead of JSON objects)
+      let parsedData = data;
+      if (typeof data === "string") {
+        try {
+          parsedData = JSON.parse(data);
+        } catch (e) {
+          console.error("❌ Failed to parse message data:", e);
+          return;
+        }
+      }
 
-    socket.on("typing", ({ roomId }) => {
-      socket.to(roomId).emit("user_typing", { userId, isTyping: true });
-    });
+      const { receiverId, text, tempId, imageUrl, replyToId } = parsedData;
+      const senderId = userId; // Force sender ID to be the authenticated socket user
 
-    socket.on("stop_typing", ({ roomId }) => {
-      socket.to(roomId).emit("user_typing", { userId, isTyping: false });
-    });
+      if (!receiverId || (!text && !imageUrl)) {
+        console.warn(
+          "⚠️ Warning: Missing required fields (receiverId or content)",
+        );
+        socket.emit("error", { message: "Invalid message payload." });
+        return;
+      }
 
-    socket.on("send_message", async (data, callback) => {
       try {
-        const messagePayload = {
-          id: crypto.randomUUID(),
-          roomId: data.roomId,
-          senderId: userId,
-          senderRole: socket.user.role || "USER",
-          content: data.content || null,
-          fileUrl: data.fileUrl || null,
-          fileName: data.fileName || null,
-          fileType: data.fileType || null,
-          isDeleted: false,
-          isRead: false,
-          timestamp: new Date().toISOString(),
-        };
+        // Sort IDs to ensure consistent ChatSession lookup (e.g., 'userA_userB')
+        const [user1Id, user2Id] = [senderId, receiverId].sort();
 
-        // Broadcast to everyone in the chat room (including sender)
-        io.to(data.roomId).emit("receive_message", messagePayload);
+        // 1. Manage the Chat Session
+        const session = await prisma.chatSession.upsert({
+          where: { user1Id_user2Id: { user1Id, user2Id } },
+          update: { status: "OPEN", updatedAt: new Date() },
+          create: { user1Id, user2Id, status: "OPEN" },
+        });
 
-        // Offload DB Save to Redis Streams
-        await redisClient.xadd(
-          "stream:chat_messages",
-          "*",
-          "payload",
-          JSON.stringify(messagePayload),
+        // 2. Save Message to Database
+        const savedMessage = await prisma.chatMessage.create({
+          data: {
+            chatSessionId: session.id,
+            senderId: senderId,
+            text: text || null,
+            imageUrl: imageUrl || null,
+            replyToId: replyToId || null,
+            isRead: false,
+          },
+          include: {
+            // Include original message details if it's a reply
+            replyTo: replyToId
+              ? {
+                  select: {
+                    id: true,
+                    text: true,
+                    senderId: true,
+                    imageUrl: true,
+                  },
+                }
+              : false,
+          },
+        });
+
+        console.log(
+          `✅ Message saved: Session ${session.id} | Msg ${savedMessage.id}`,
         );
 
-        if (typeof callback === "function") {
-          callback({ status: "sent", id: messagePayload.id });
-        }
-      } catch (err) {
-        logger.error(`[Chat] Send message failed: ${err.message}`);
+        // 3. ACKNOWLEDGEMENT (Optimistic UI sync for the sender)
+        socket.emit("message_confirmed", {
+          tempId: tempId,
+          message: savedMessage,
+        });
+
+        // 4. BROADCAST
+        // Send to receiver AND sender (so sender's other open tabs update too)
+        const broadcastPayload = { ...savedMessage, tempId: tempId || null };
+        io.to(`user_${receiverId}`)
+          .to(`user_${senderId}`)
+          .emit("receive_message", broadcastPayload);
+      } catch (error) {
+        console.error("❌ PRISMA DATABASE ERROR (send_message):", error);
+        socket.emit("error", {
+          message: "Failed to process message on server.",
+        });
       }
     });
 
-    socket.on("delete_message", async ({ messageId, roomId }) => {
-      io.to(roomId).emit("message_deleted", { messageId });
+    // ==========================================
+    // 🗑️ CHAT: DELETE MESSAGE
+    // ==========================================
+    socket.on("delete_message", async (data) => {
+      const parsedData = typeof data === "string" ? JSON.parse(data) : data;
+      const { messageId, partnerId } = parsedData;
+
+      if (!messageId) return;
+
       try {
-        await prisma.chatMessage.update({
+        // Find message first to verify ownership
+        const msg = await prisma.chatMessage.findUnique({
           where: { id: messageId },
-          data: { isDeleted: true },
+          select: { senderId: true },
         });
-      } catch (err) {
-        logger.error(`[Chat] Delete failed: ${err.message}`);
-      }
-    });
 
-    socket.on("mark_messages_read", async ({ messageIds, roomId }) => {
-      io.to(roomId).emit("messages_read", { messageIds, readBy: userId });
-      try {
-        await prisma.chatMessage.updateMany({
-          where: { id: { in: messageIds } },
-          data: { isRead: true },
-        });
-      } catch (err) {
-        logger.error(`[Chat] Read receipt update failed: ${err.message}`);
-      }
-    });
+        if (!msg) return;
 
-    socket.on("disconnect", async () => {
-      logger.info(
-        `[WebSocket] User ${userId} disconnected. Socket ID: ${socket.id}`,
-      );
-      try {
-        const activeTabs = await io.in(userId).fetchSockets();
-        if (activeTabs.length === 0) {
-          await prisma.userPresence.update({
-            where: { userId },
-            data: { isOnline: false, lastSeen: new Date() },
+        // Security check: Only the sender can delete their message
+        if (msg.senderId !== userId) {
+          socket.emit("error", {
+            message: "Unauthorized to delete this message.",
           });
-          io.emit("user_status_change", {
-            userId,
-            isOnline: false,
-            lastSeen: new Date(),
-          });
+          return;
         }
-      } catch (err) {
-        logger.error(`[WebSocket] Presence disconnect failed: ${err.message}`);
+
+        await prisma.chatMessage.delete({
+          where: { id: messageId },
+        });
+
+        console.log(`🗑️ Message ${messageId} deleted by ${userId}`);
+
+        // Notify both parties to remove it from their UI
+        if (partnerId) {
+          io.to(`user_${partnerId}`)
+            .to(`user_${userId}`)
+            .emit("message_deleted", { messageId });
+        }
+      } catch (error) {
+        console.error("❌ Error deleting message:", error);
+      }
+    });
+
+    // ==========================================
+    // ✍️ CHAT: TYPING INDICATORS
+    // ==========================================
+    socket.on("typing", (data) => {
+      const receiverId = typeof data === "object" ? data.receiverId : data;
+      if (receiverId) {
+        io.to(`user_${receiverId}`).emit("user_typing", { senderId: userId });
+      }
+    });
+
+    socket.on("stop_typing", (data) => {
+      const receiverId = typeof data === "object" ? data.receiverId : data;
+      if (receiverId) {
+        io.to(`user_${receiverId}`).emit("user_stopped_typing", {
+          senderId: userId,
+        });
+      }
+    });
+
+    // ==========================================
+    // ✔️✔ CHAT: READ RECEIPTS
+    // ==========================================
+    socket.on("mark_messages_read", async (data) => {
+      const parsedData = typeof data === "string" ? JSON.parse(data) : data;
+
+      // senderId refers to the person who originally sent the messages
+      // (the current user is reading them)
+      const senderId = parsedData.senderId;
+
+      if (!senderId) return;
+
+      try {
+        const [user1Id, user2Id] = [userId, senderId].sort();
+        const now = new Date();
+
+        const session = await prisma.chatSession.findUnique({
+          where: { user1Id_user2Id: { user1Id, user2Id } },
+        });
+
+        if (session) {
+          // Update all unread messages in this session sent by the partner
+          const updateResult = await prisma.chatMessage.updateMany({
+            where: {
+              chatSessionId: session.id,
+              senderId: senderId,
+              isRead: false,
+            },
+            data: {
+              isRead: true,
+              readAt: now,
+            },
+          });
+
+          // If we actually updated messages, notify the original sender
+          if (updateResult.count > 0) {
+            io.to(`user_${senderId}`).emit("messages_read_by_recipient", {
+              readerId: userId,
+              readAt: now.toISOString(),
+            });
+
+            // Sync the reader's other devices so they clear unread badges immediately
+            socket.emit("read_status_synced", { partnerId: senderId });
+          }
+        }
+      } catch (error) {
+        console.error("❌ Error marking read:", error);
+      }
+    });
+
+    // ==========================================
+    // 🔴 PRESENCE: USER OFFLINE (DISCONNECT)
+    // ==========================================
+    socket.on("disconnect", async () => {
+      const lastSeenTime = new Date().toISOString();
+
+      try {
+        // 1. Remove from online set
+        await redisClient.srem("online_users", userId);
+
+        // 2. Set last seen time in Redis (Expires after 7 days to save memory)
+        await redisClient.set(
+          `last_seen:${userId}`,
+          lastSeenTime,
+          "EX",
+          60 * 60 * 24 * 7,
+        );
+
+        // 3. Broadcast offline status
+        io.emit("user_status_changed", {
+          userId: userId,
+          isOnline: false,
+          lastSeen: lastSeenTime,
+        });
+
+        console.log(`🔌 User Offline: ${userId} (Last seen: ${lastSeenTime})`);
+      } catch (error) {
+        console.error("❌ Redis Error on disconnect:", error);
       }
     });
   });
@@ -357,10 +321,11 @@ export const initWebSocketServer = (server) => {
   return io;
 };
 
-// 🚨 Payload is generated in consumer.js and passed down securely
+// Externally accessible push function for HTTP REST triggers
 export const pushToUserWebsocket = (userId, payload) => {
   if (ioInstance) {
-    ioInstance.to(userId).emit("new_notification", payload);
+    // 🚨 FIX: Emit to the correctly formatted room name
+    ioInstance.to(`user_${userId}`).emit("new_notification", payload);
   } else {
     logger.warn("[WebSocket] ioInstance not initialized.");
   }

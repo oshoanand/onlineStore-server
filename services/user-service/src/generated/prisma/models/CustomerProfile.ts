@@ -20,8 +20,18 @@ export type CustomerProfileModel = runtime.Types.Result.DefaultSelection<Prisma.
 
 export type AggregateCustomerProfile = {
   _count: CustomerProfileCountAggregateOutputType | null
+  _avg: CustomerProfileAvgAggregateOutputType | null
+  _sum: CustomerProfileSumAggregateOutputType | null
   _min: CustomerProfileMinAggregateOutputType | null
   _max: CustomerProfileMaxAggregateOutputType | null
+}
+
+export type CustomerProfileAvgAggregateOutputType = {
+  totalOrders: number | null
+}
+
+export type CustomerProfileSumAggregateOutputType = {
+  totalOrders: number | null
 }
 
 export type CustomerProfileMinAggregateOutputType = {
@@ -29,6 +39,7 @@ export type CustomerProfileMinAggregateOutputType = {
   userId: string | null
   fullName: string | null
   profilePhoto: string | null
+  totalOrders: number | null
   city: string | null
   state: string | null
   pincode: string | null
@@ -42,6 +53,7 @@ export type CustomerProfileMaxAggregateOutputType = {
   userId: string | null
   fullName: string | null
   profilePhoto: string | null
+  totalOrders: number | null
   city: string | null
   state: string | null
   pincode: string | null
@@ -55,6 +67,7 @@ export type CustomerProfileCountAggregateOutputType = {
   userId: number
   fullName: number
   profilePhoto: number
+  totalOrders: number
   city: number
   state: number
   pincode: number
@@ -65,11 +78,20 @@ export type CustomerProfileCountAggregateOutputType = {
 }
 
 
+export type CustomerProfileAvgAggregateInputType = {
+  totalOrders?: true
+}
+
+export type CustomerProfileSumAggregateInputType = {
+  totalOrders?: true
+}
+
 export type CustomerProfileMinAggregateInputType = {
   id?: true
   userId?: true
   fullName?: true
   profilePhoto?: true
+  totalOrders?: true
   city?: true
   state?: true
   pincode?: true
@@ -83,6 +105,7 @@ export type CustomerProfileMaxAggregateInputType = {
   userId?: true
   fullName?: true
   profilePhoto?: true
+  totalOrders?: true
   city?: true
   state?: true
   pincode?: true
@@ -96,6 +119,7 @@ export type CustomerProfileCountAggregateInputType = {
   userId?: true
   fullName?: true
   profilePhoto?: true
+  totalOrders?: true
   city?: true
   state?: true
   pincode?: true
@@ -143,6 +167,18 @@ export type CustomerProfileAggregateArgs<ExtArgs extends runtime.Types.Extension
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: CustomerProfileAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: CustomerProfileSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: CustomerProfileMinAggregateInputType
@@ -173,6 +209,8 @@ export type CustomerProfileGroupByArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   _count?: CustomerProfileCountAggregateInputType | true
+  _avg?: CustomerProfileAvgAggregateInputType
+  _sum?: CustomerProfileSumAggregateInputType
   _min?: CustomerProfileMinAggregateInputType
   _max?: CustomerProfileMaxAggregateInputType
 }
@@ -182,6 +220,7 @@ export type CustomerProfileGroupByOutputType = {
   userId: string
   fullName: string
   profilePhoto: string | null
+  totalOrders: number
   city: string | null
   state: string | null
   pincode: string | null
@@ -189,6 +228,8 @@ export type CustomerProfileGroupByOutputType = {
   createdAt: Date
   updatedAt: Date
   _count: CustomerProfileCountAggregateOutputType | null
+  _avg: CustomerProfileAvgAggregateOutputType | null
+  _sum: CustomerProfileSumAggregateOutputType | null
   _min: CustomerProfileMinAggregateOutputType | null
   _max: CustomerProfileMaxAggregateOutputType | null
 }
@@ -216,6 +257,7 @@ export type CustomerProfileWhereInput = {
   userId?: Prisma.StringFilter<"CustomerProfile"> | string
   fullName?: Prisma.StringFilter<"CustomerProfile"> | string
   profilePhoto?: Prisma.StringNullableFilter<"CustomerProfile"> | string | null
+  totalOrders?: Prisma.IntFilter<"CustomerProfile"> | number
   city?: Prisma.StringNullableFilter<"CustomerProfile"> | string | null
   state?: Prisma.StringNullableFilter<"CustomerProfile"> | string | null
   pincode?: Prisma.StringNullableFilter<"CustomerProfile"> | string | null
@@ -232,6 +274,7 @@ export type CustomerProfileOrderByWithRelationInput = {
   userId?: Prisma.SortOrder
   fullName?: Prisma.SortOrder
   profilePhoto?: Prisma.SortOrderInput | Prisma.SortOrder
+  totalOrders?: Prisma.SortOrder
   city?: Prisma.SortOrderInput | Prisma.SortOrder
   state?: Prisma.SortOrderInput | Prisma.SortOrder
   pincode?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -251,6 +294,7 @@ export type CustomerProfileWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.CustomerProfileWhereInput | Prisma.CustomerProfileWhereInput[]
   fullName?: Prisma.StringFilter<"CustomerProfile"> | string
   profilePhoto?: Prisma.StringNullableFilter<"CustomerProfile"> | string | null
+  totalOrders?: Prisma.IntFilter<"CustomerProfile"> | number
   city?: Prisma.StringNullableFilter<"CustomerProfile"> | string | null
   state?: Prisma.StringNullableFilter<"CustomerProfile"> | string | null
   pincode?: Prisma.StringNullableFilter<"CustomerProfile"> | string | null
@@ -267,6 +311,7 @@ export type CustomerProfileOrderByWithAggregationInput = {
   userId?: Prisma.SortOrder
   fullName?: Prisma.SortOrder
   profilePhoto?: Prisma.SortOrderInput | Prisma.SortOrder
+  totalOrders?: Prisma.SortOrder
   city?: Prisma.SortOrderInput | Prisma.SortOrder
   state?: Prisma.SortOrderInput | Prisma.SortOrder
   pincode?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -274,8 +319,10 @@ export type CustomerProfileOrderByWithAggregationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.CustomerProfileCountOrderByAggregateInput
+  _avg?: Prisma.CustomerProfileAvgOrderByAggregateInput
   _max?: Prisma.CustomerProfileMaxOrderByAggregateInput
   _min?: Prisma.CustomerProfileMinOrderByAggregateInput
+  _sum?: Prisma.CustomerProfileSumOrderByAggregateInput
 }
 
 export type CustomerProfileScalarWhereWithAggregatesInput = {
@@ -286,6 +333,7 @@ export type CustomerProfileScalarWhereWithAggregatesInput = {
   userId?: Prisma.StringWithAggregatesFilter<"CustomerProfile"> | string
   fullName?: Prisma.StringWithAggregatesFilter<"CustomerProfile"> | string
   profilePhoto?: Prisma.StringNullableWithAggregatesFilter<"CustomerProfile"> | string | null
+  totalOrders?: Prisma.IntWithAggregatesFilter<"CustomerProfile"> | number
   city?: Prisma.StringNullableWithAggregatesFilter<"CustomerProfile"> | string | null
   state?: Prisma.StringNullableWithAggregatesFilter<"CustomerProfile"> | string | null
   pincode?: Prisma.StringNullableWithAggregatesFilter<"CustomerProfile"> | string | null
@@ -298,6 +346,7 @@ export type CustomerProfileCreateInput = {
   id?: string
   fullName: string
   profilePhoto?: string | null
+  totalOrders?: number
   city?: string | null
   state?: string | null
   pincode?: string | null
@@ -314,6 +363,7 @@ export type CustomerProfileUncheckedCreateInput = {
   userId: string
   fullName: string
   profilePhoto?: string | null
+  totalOrders?: number
   city?: string | null
   state?: string | null
   pincode?: string | null
@@ -328,6 +378,7 @@ export type CustomerProfileUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totalOrders?: Prisma.IntFieldUpdateOperationsInput | number
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pincode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -344,6 +395,7 @@ export type CustomerProfileUncheckedUpdateInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totalOrders?: Prisma.IntFieldUpdateOperationsInput | number
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pincode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -359,6 +411,7 @@ export type CustomerProfileCreateManyInput = {
   userId: string
   fullName: string
   profilePhoto?: string | null
+  totalOrders?: number
   city?: string | null
   state?: string | null
   pincode?: string | null
@@ -371,6 +424,7 @@ export type CustomerProfileUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totalOrders?: Prisma.IntFieldUpdateOperationsInput | number
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pincode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -384,6 +438,7 @@ export type CustomerProfileUncheckedUpdateManyInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totalOrders?: Prisma.IntFieldUpdateOperationsInput | number
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pincode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -402,6 +457,7 @@ export type CustomerProfileCountOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   fullName?: Prisma.SortOrder
   profilePhoto?: Prisma.SortOrder
+  totalOrders?: Prisma.SortOrder
   city?: Prisma.SortOrder
   state?: Prisma.SortOrder
   pincode?: Prisma.SortOrder
@@ -410,11 +466,16 @@ export type CustomerProfileCountOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
 }
 
+export type CustomerProfileAvgOrderByAggregateInput = {
+  totalOrders?: Prisma.SortOrder
+}
+
 export type CustomerProfileMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   fullName?: Prisma.SortOrder
   profilePhoto?: Prisma.SortOrder
+  totalOrders?: Prisma.SortOrder
   city?: Prisma.SortOrder
   state?: Prisma.SortOrder
   pincode?: Prisma.SortOrder
@@ -428,12 +489,17 @@ export type CustomerProfileMinOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   fullName?: Prisma.SortOrder
   profilePhoto?: Prisma.SortOrder
+  totalOrders?: Prisma.SortOrder
   city?: Prisma.SortOrder
   state?: Prisma.SortOrder
   pincode?: Prisma.SortOrder
   fullAddress?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type CustomerProfileSumOrderByAggregateInput = {
+  totalOrders?: Prisma.SortOrder
 }
 
 export type CustomerProfileScalarRelationFilter = {
@@ -473,6 +539,14 @@ export type CustomerProfileUncheckedUpdateOneWithoutUserNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.CustomerProfileUpdateToOneWithWhereWithoutUserInput, Prisma.CustomerProfileUpdateWithoutUserInput>, Prisma.CustomerProfileUncheckedUpdateWithoutUserInput>
 }
 
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type CustomerProfileCreateNestedOneWithoutAddressesInput = {
   create?: Prisma.XOR<Prisma.CustomerProfileCreateWithoutAddressesInput, Prisma.CustomerProfileUncheckedCreateWithoutAddressesInput>
   connectOrCreate?: Prisma.CustomerProfileCreateOrConnectWithoutAddressesInput
@@ -505,6 +579,7 @@ export type CustomerProfileCreateWithoutUserInput = {
   id?: string
   fullName: string
   profilePhoto?: string | null
+  totalOrders?: number
   city?: string | null
   state?: string | null
   pincode?: string | null
@@ -519,6 +594,7 @@ export type CustomerProfileUncheckedCreateWithoutUserInput = {
   id?: string
   fullName: string
   profilePhoto?: string | null
+  totalOrders?: number
   city?: string | null
   state?: string | null
   pincode?: string | null
@@ -549,6 +625,7 @@ export type CustomerProfileUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totalOrders?: Prisma.IntFieldUpdateOperationsInput | number
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pincode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -563,6 +640,7 @@ export type CustomerProfileUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totalOrders?: Prisma.IntFieldUpdateOperationsInput | number
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pincode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -577,6 +655,7 @@ export type CustomerProfileCreateWithoutAddressesInput = {
   id?: string
   fullName: string
   profilePhoto?: string | null
+  totalOrders?: number
   city?: string | null
   state?: string | null
   pincode?: string | null
@@ -592,6 +671,7 @@ export type CustomerProfileUncheckedCreateWithoutAddressesInput = {
   userId: string
   fullName: string
   profilePhoto?: string | null
+  totalOrders?: number
   city?: string | null
   state?: string | null
   pincode?: string | null
@@ -621,6 +701,7 @@ export type CustomerProfileUpdateWithoutAddressesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totalOrders?: Prisma.IntFieldUpdateOperationsInput | number
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pincode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -636,6 +717,7 @@ export type CustomerProfileUncheckedUpdateWithoutAddressesInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totalOrders?: Prisma.IntFieldUpdateOperationsInput | number
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pincode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -649,6 +731,7 @@ export type CustomerProfileCreateWithoutBankCardsInput = {
   id?: string
   fullName: string
   profilePhoto?: string | null
+  totalOrders?: number
   city?: string | null
   state?: string | null
   pincode?: string | null
@@ -664,6 +747,7 @@ export type CustomerProfileUncheckedCreateWithoutBankCardsInput = {
   userId: string
   fullName: string
   profilePhoto?: string | null
+  totalOrders?: number
   city?: string | null
   state?: string | null
   pincode?: string | null
@@ -693,6 +777,7 @@ export type CustomerProfileUpdateWithoutBankCardsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totalOrders?: Prisma.IntFieldUpdateOperationsInput | number
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pincode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -708,6 +793,7 @@ export type CustomerProfileUncheckedUpdateWithoutBankCardsInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   profilePhoto?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totalOrders?: Prisma.IntFieldUpdateOperationsInput | number
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pincode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -762,6 +848,7 @@ export type CustomerProfileSelect<ExtArgs extends runtime.Types.Extensions.Inter
   userId?: boolean
   fullName?: boolean
   profilePhoto?: boolean
+  totalOrders?: boolean
   city?: boolean
   state?: boolean
   pincode?: boolean
@@ -779,6 +866,7 @@ export type CustomerProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   userId?: boolean
   fullName?: boolean
   profilePhoto?: boolean
+  totalOrders?: boolean
   city?: boolean
   state?: boolean
   pincode?: boolean
@@ -793,6 +881,7 @@ export type CustomerProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   userId?: boolean
   fullName?: boolean
   profilePhoto?: boolean
+  totalOrders?: boolean
   city?: boolean
   state?: boolean
   pincode?: boolean
@@ -807,6 +896,7 @@ export type CustomerProfileSelectScalar = {
   userId?: boolean
   fullName?: boolean
   profilePhoto?: boolean
+  totalOrders?: boolean
   city?: boolean
   state?: boolean
   pincode?: boolean
@@ -815,7 +905,7 @@ export type CustomerProfileSelectScalar = {
   updatedAt?: boolean
 }
 
-export type CustomerProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "fullName" | "profilePhoto" | "city" | "state" | "pincode" | "fullAddress" | "createdAt" | "updatedAt", ExtArgs["result"]["customerProfile"]>
+export type CustomerProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "fullName" | "profilePhoto" | "totalOrders" | "city" | "state" | "pincode" | "fullAddress" | "createdAt" | "updatedAt", ExtArgs["result"]["customerProfile"]>
 export type CustomerProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   addresses?: boolean | Prisma.CustomerProfile$addressesArgs<ExtArgs>
@@ -841,6 +931,7 @@ export type $CustomerProfilePayload<ExtArgs extends runtime.Types.Extensions.Int
     userId: string
     fullName: string
     profilePhoto: string | null
+    totalOrders: number
     city: string | null
     state: string | null
     pincode: string | null
@@ -1277,6 +1368,7 @@ export interface CustomerProfileFieldRefs {
   readonly userId: Prisma.FieldRef<"CustomerProfile", 'String'>
   readonly fullName: Prisma.FieldRef<"CustomerProfile", 'String'>
   readonly profilePhoto: Prisma.FieldRef<"CustomerProfile", 'String'>
+  readonly totalOrders: Prisma.FieldRef<"CustomerProfile", 'Int'>
   readonly city: Prisma.FieldRef<"CustomerProfile", 'String'>
   readonly state: Prisma.FieldRef<"CustomerProfile", 'String'>
   readonly pincode: Prisma.FieldRef<"CustomerProfile", 'String'>

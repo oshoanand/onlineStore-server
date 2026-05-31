@@ -53,16 +53,42 @@ model Product {
     thumbImage String? // Primary thumbnail URL (MinIO)
     imageArray String[] // Up to 4 additional images
 
+    //marketplaceLinks
+    avitoLink        String? // URL to Avito listing
+    yandexmarketLink String? // URL to Yandex.Market listing
+    ozonLink         String? // URL to Ozon listing
+    wildberriesLink  String? // URL to Wildberries listing
+    amazonLink       String? // URL to Amazon listing
+
     // Timestamps
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
+    marketplaceClicks MarketplaceClick[]
+
     @@index([slug])
-    // FIX: Removed @@index([categories]) as it is a relation, not a scalar field
     @@index([brand])
     @@index([status])
     @@schema("shop_product")
 }
+
+model MarketplaceClick {
+    id          String   @id @default(uuid())
+    productId   String
+    marketplace String // e.g., "OZON", "YANDEX_MARKET", "AVITO", "WILDBERRIES", "AMAZON"
+    userAgent   String? // Optional: to track mobile vs desktop
+    clickedAt   DateTime @default(now())
+
+    product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+    @@index([productId])
+    @@index([marketplace])
+    @@index([clickedAt])
+    @@schema("shop_product")
+}
+
+// Don't forget to add the inverse relation inside your existing Product model:
+// marketplaceClicks MarketplaceClick[]
 
 model Category {
     id          String  @id @default(uuid())

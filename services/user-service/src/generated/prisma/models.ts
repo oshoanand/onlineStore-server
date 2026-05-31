@@ -9,14 +9,16 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/User.ts'
+export type * from './models/AdministratorProfile.ts'
 export type * from './models/CustomerProfile.ts'
+export type * from './models/CourierProfile.ts'
+export type * from './models/SupportProfile.ts'
 export type * from './models/Address.ts'
 export type * from './models/BankCard.ts'
-export type * from './models/AdministratorProfile.ts'
 export type * from './models/Account.ts'
 export type * from './models/Session.ts'
 export type * from './models/VerificationToken.ts'
-export type * from './models/Support.ts'
+export type * from './models/SupportTicket.ts'
 export type * from './models/Article.ts'
 export type * from './models/ArticleComment.ts'
 export type * from './models/ArticleLike.ts'

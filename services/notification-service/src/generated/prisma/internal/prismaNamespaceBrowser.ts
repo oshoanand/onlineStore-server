@@ -52,6 +52,7 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   Notification: 'Notification',
+  ChatSession: 'ChatSession',
   ChatMessage: 'ChatMessage',
   UserPresence: 'UserPresence'
 } as const
@@ -86,20 +87,29 @@ export const NotificationScalarFieldEnum = {
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
+export const ChatSessionScalarFieldEnum = {
+  id: 'id',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  user1Id: 'user1Id',
+  user2Id: 'user2Id'
+} as const
+
+export type ChatSessionScalarFieldEnum = (typeof ChatSessionScalarFieldEnum)[keyof typeof ChatSessionScalarFieldEnum]
+
+
 export const ChatMessageScalarFieldEnum = {
   id: 'id',
-  roomId: 'roomId',
-  senderId: 'senderId',
-  senderRole: 'senderRole',
-  content: 'content',
-  fileUrl: 'fileUrl',
-  fileName: 'fileName',
-  fileType: 'fileType',
-  fileSize: 'fileSize',
+  text: 'text',
+  imageUrl: 'imageUrl',
   isRead: 'isRead',
   isDeleted: 'isDeleted',
+  readAt: 'readAt',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  chatSessionId: 'chatSessionId',
+  senderId: 'senderId',
+  replyToId: 'replyToId'
 } as const
 
 export type ChatMessageScalarFieldEnum = (typeof ChatMessageScalarFieldEnum)[keyof typeof ChatMessageScalarFieldEnum]

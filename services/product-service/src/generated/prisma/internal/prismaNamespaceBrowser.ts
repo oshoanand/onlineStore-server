@@ -52,6 +52,7 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   Product: 'Product',
+  MarketplaceClick: 'MarketplaceClick',
   Category: 'Category',
   ShippingZone: 'ShippingZone'
 } as const
@@ -97,11 +98,27 @@ export const ProductScalarFieldEnum = {
   keywords: 'keywords',
   thumbImage: 'thumbImage',
   imageArray: 'imageArray',
+  avitoLink: 'avitoLink',
+  yandexmarketLink: 'yandexmarketLink',
+  ozonLink: 'ozonLink',
+  wildberriesLink: 'wildberriesLink',
+  amazonLink: 'amazonLink',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
+
+
+export const MarketplaceClickScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  marketplace: 'marketplace',
+  userAgent: 'userAgent',
+  clickedAt: 'clickedAt'
+} as const
+
+export type MarketplaceClickScalarFieldEnum = (typeof MarketplaceClickScalarFieldEnum)[keyof typeof MarketplaceClickScalarFieldEnum]
 
 
 export const CategoryScalarFieldEnum = {

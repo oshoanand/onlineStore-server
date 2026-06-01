@@ -2,7 +2,6 @@ import express from "express";
 import { register, login } from "../controllers/auth.js";
 import {
   getProfile,
-  getUsersList,
   createUser,
   updateUser,
   deleteUser,
@@ -15,6 +14,8 @@ import {
   updateProfileImage,
   updateProfileDetails,
   getUserById,
+  getNonCustomersList,
+  getAdminList,
 } from "../controllers/user.js";
 import {
   getCustomersList,
@@ -70,6 +71,7 @@ router.use("/blogs", blogRoutes);
 router.use(requireAuth);
 router.use("/support", supportRoutes);
 
+router.get("/admins/list", getAdminList); // List of users with administrator role
 router.get("/profile", getProfile);
 router.put("/profile/update-details/:id", updateProfileDetails);
 
@@ -83,7 +85,7 @@ router.post("/addresses", addAddress);
 router.put("/addresses/:id", updateAddress);
 router.delete("/addresses/:id", deleteAddress);
 
-router.get("/admin/list", requireAdmin, getUsersList);
+router.get("/admin/list", requireAdmin, getNonCustomersList); // List of users with admin/support/courier roles for admin management UI
 router.post("/admin/create", requireAdmin, createUser);
 router.delete("/admin/user/:id", requireAdmin, deleteUser);
 router.put("/admin/user/:id", requireAdmin, updateUser);

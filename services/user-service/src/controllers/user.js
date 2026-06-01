@@ -1,12 +1,19 @@
 import prisma from "../config/prisma.js";
 import { NotFoundError, BadRequestError } from "@shop/utils";
 import { optimizeAndUpload } from "@shop/utils";
+import { fetchCached, invalidatePattern } from "@shop/event-bus";
 import bcrypt from "bcryptjs";
 import axios from "axios";
 
 // Import Firebase messaging to resolve the undefined error in registerDeviceToken
 // Adjust this path if your firebase admin initialization is located elsewhere
 import { messaging } from "../config/firebase.js";
+
+// ==========================================
+// CONFIGURATION
+// ==========================================
+// Unique namespace for this microservice to prevent Redis key collisions
+const CACHE_PREFIX = "userSvc:list";
 
 // ==========================================
 // HELPER: SYNC CUSTOMER ORDER STATS
@@ -81,22 +88,29 @@ export const getProfile = async (req, res, next) => {
     const userId = req.user.id;
 
     syncCustomerOrderStats(userId);
-
     const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        email: true,
-        mobile: true,
-        role: true,
-        status: true,
-        customerProfile: true,
+      where: { id: req.user.id },
+      // Use nested include to traverse User -> CustomerProfile -> Addresses
+      include: {
+        customerProfile: {
+          include: {
+            addresses: true,
+          },
+        },
       },
     });
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+    if (!user) throw new NotFoundError("User not found");
+
+    //     // Remove sensitive data
+    user.passwordHash = undefined;
+
+    // Flatten the response so the frontend can read `data.addresses` directly
+    // safely defaulting to an empty array if the profile or addresses don't exist yet
+    const userAddresses = user.customerProfile?.addresses || [];
+
+    // Attach addresses to the root of the user object
+    user.addresses = userAddresses;
 
     res.status(200).json({ status: "success", data: user });
   } catch (error) {
@@ -394,31 +408,79 @@ export const registerDeviceToken = async (req, res, next) => {
  * 🚨 Provides safe user data to other microservices (e.g. Notification Service)
  * Called via /internal/:id
  */
+// export const getInternalUser = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+
+//     const user = await prisma.user.findUnique({
+//       where: { id },
+//       select: {
+//         id: true,
+//         email: true,
+//         mobile: true,
+//         customerProfile: {
+//           select: {
+//             fullName: true,
+//             profilePhoto: true,
+//           },
+//         },
+//       },
+//     });
+
+//     // This will now correctly trigger if the user is null
+//     if (!user) {
+//       throw new NotFoundError("User not found");
+//     }
+
+//     res.status(200).json({ status: "success", data: user });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
 export const getInternalUser = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const user = await prisma.user.findUnique({
-      where: { id },
-      select: {
-        id: true,
-        email: true,
-        mobile: true,
-        customerProfile: {
-          select: {
-            fullName: true,
-            profilePhoto: true,
+    const dbQuery = async () => {
+      const user = await prisma.user.findUnique({
+        where: { id },
+        select: {
+          id: true,
+          email: true,
+          mobile: true,
+          role: true,
+          updatedAt: true,
+          customerProfile: {
+            select: {
+              fullName: true,
+              profilePhoto: true,
+            },
+          },
+          administratorProfile: {
+            select: {
+              fullName: true,
+              profilePhoto: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    // This will now correctly trigger if the user is null
-    if (!user) {
-      throw new NotFoundError("User not found");
-    }
+      if (!user) {
+        throw new NotFoundError("User not found");
+      }
 
-    res.status(200).json({ status: "success", data: user });
+      return user;
+    };
+
+    const userProfile = await fetchCached(
+      CACHE_PREFIX,
+      "internal_user",
+      dbQuery,
+      86400,
+    );
+
+    res.status(200).json({ status: "success", data: userProfile });
   } catch (error) {
     next(error);
   }
@@ -543,7 +605,7 @@ export const updateProfileDetails = async (req, res, next) => {
   }
 };
 
-export const getUsersList = async (req, res, next) => {
+export const getNonCustomersList = async (req, res, next) => {
   try {
     const users = await prisma.user.findMany({
       where: {
@@ -580,6 +642,48 @@ export const getUsersList = async (req, res, next) => {
         user.customerProfile?.profilePhoto ||
         null,
     }));
+
+    res.status(200).json(formattedUsers);
+  } catch (error) {
+    console.error("Fetch users error:", error);
+    next(error);
+  }
+};
+
+export const getAdminList = async (req, res, next) => {
+  try {
+    const dbQuery = async () => {
+      const users = await prisma.user.findMany({
+        where: {
+          role: "ADMINISTRATOR",
+        },
+        include: {
+          administratorProfile: {
+            select: { fullName: true, profilePhoto: true },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+      });
+
+      const formattedUsers = users.map((user) => ({
+        id: user.id,
+        mobile: user.mobile,
+        email: user.email,
+        role: user.role,
+        createdAt: user.createdAt,
+        status: user.status,
+        name: user.administratorProfile?.fullName || "Без имени",
+        profilePhoto: user.administratorProfile?.profilePhoto || null,
+      }));
+      return formattedUsers;
+    };
+
+    const formattedUsers = await fetchCached(
+      CACHE_PREFIX,
+      "admins",
+      dbQuery,
+      86400,
+    );
 
     res.status(200).json(formattedUsers);
   } catch (error) {

@@ -11,6 +11,7 @@ import {
   updateProductStatus,
   deleteProduct,
   createMarketplaceClickEvent,
+  searchProductsFull,
 } from "../controllers/product.js";
 import { createUploader, requireInternalAuth } from "@shop/utils";
 import { requireAdmin } from "../middlewares/authHeaders.js";
@@ -37,6 +38,8 @@ router.post("/public/analytics/marketplace-click", createMarketplaceClickEvent);
 router.get("/public/slug/:slug", getPublicProductBySlug);
 // Cross-selling: Get related products based on categories
 router.get("/public/:id/related", getRelatedProducts);
+// Search route for the Header autocomplete (same as category search but with product-specific relevance)
+router.get("/public/search", searchProductsFull);
 
 // ==========================================
 // 2. ADMIN PROTECTED ROUTES

@@ -665,6 +665,8 @@ export const getAdminList = async (req, res, next) => {
         orderBy: { createdAt: "desc" },
       });
 
+      console.log(users[0]);
+
       const formattedUsers = users.map((user) => ({
         id: user.id,
         mobile: user.mobile,
@@ -675,6 +677,7 @@ export const getAdminList = async (req, res, next) => {
         name: user.administratorProfile?.fullName || "Без имени",
         profilePhoto: user.administratorProfile?.profilePhoto || null,
       }));
+
       return formattedUsers;
     };
 

@@ -3,6 +3,7 @@ import { optimizeAndUpload } from "@shop/utils";
 import { invalidatePattern, fetchCached } from "@shop/event-bus/src/redis.js"; // Ensure the path matches your event-bus export
 
 const CACHE_PREFIX = "productSvc:products";
+const SEARCH_CACHE_PREFIX = "productSvc:search";
 
 const VALID_MARKETPLACES = [
   "YANDEX_MARKET",
@@ -23,6 +24,140 @@ const parseFormDataField = (field) => {
     return JSON.parse(field);
   } catch (e) {
     return field.split(",").map((i) => i.trim()); // Fallback for comma-separated strings
+  }
+};
+
+// ==========================================
+// PUBLIC: FULL PRODUCT SEARCH & FILTER
+// ==========================================
+export const searchProductsFull = async (req, res, next) => {
+  try {
+    const { q, category, page = 1, limit = 24 } = req.query;
+
+    const pageNum = Number(page);
+    const limitNum = Number(limit);
+    const skip = (pageNum - 1) * limitNum;
+
+    // 1. GENERATE A UNIQUE CACHE KEY
+    // Normalize inputs so "Shirts " and "shirts" hit the same cache
+    const normalizedQ = q ? q.toLowerCase().trim() : "none";
+    const normalizedCat = category ? category.toLowerCase().trim() : "none";
+
+    // Format: "none:mens-clothing:1:24" or "iphone:none:2:24"
+    const cacheKey = `${normalizedQ}:${normalizedCat}:${pageNum}:${limitNum}`;
+
+    // 2. WRAP HEAVY LOGIC IN DB QUERY FUNCTION
+    const dbQuery = async () => {
+      let categoryIds = [];
+
+      // ---------------------------------------------------------
+      // A. HIERARCHICAL DOWNWARD RESOLUTION
+      // ---------------------------------------------------------
+      if (category) {
+        const targetCategory = await prisma.category.findUnique({
+          where: { slug: category },
+          include: {
+            children: {
+              include: { children: true },
+            },
+          },
+        });
+
+        if (targetCategory) {
+          categoryIds.push(targetCategory.id);
+
+          if (targetCategory.children) {
+            targetCategory.children.forEach((child) => {
+              categoryIds.push(child.id);
+              if (child.children) {
+                child.children.forEach((grandchild) => {
+                  categoryIds.push(grandchild.id);
+                });
+              }
+            });
+          }
+        } else {
+          // If category doesn't exist, return empty results early
+          return { products: [], total: 0, page: pageNum, totalPages: 0 };
+        }
+      }
+
+      // ---------------------------------------------------------
+      // B. BUILD THE ROBUST PRISMA 'WHERE' CLAUSE
+      // ---------------------------------------------------------
+      const whereClause = {
+        status: "ACTIVE",
+        isPublished: true,
+      };
+
+      if (categoryIds.length > 0) {
+        whereClause.categories = {
+          some: { id: { in: categoryIds } },
+        };
+      }
+
+      if (q && q.trim().length > 0) {
+        const tokens = q
+          .toLowerCase()
+          .trim()
+          .split(/\s+/)
+          .filter((t) => t.length > 0);
+
+        whereClause.AND = tokens.map((token) => ({
+          OR: [
+            { name: { contains: token, mode: "insensitive" } },
+            { brand: { contains: token, mode: "insensitive" } },
+            { tags: { hasSome: [token] } },
+          ],
+        }));
+      }
+
+      // ---------------------------------------------------------
+      // C. EXECUTE CONCURRENT QUERIES
+      // ---------------------------------------------------------
+      const [total, products] = await Promise.all([
+        prisma.product.count({ where: whereClause }),
+        prisma.product.findMany({
+          where: whereClause,
+          skip: skip,
+          take: limitNum,
+          orderBy: { createdAt: "desc" },
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            thumbImage: true,
+            price: true,
+            discountedPrice: true,
+            averageRating: true,
+            reviewCount: true,
+            brand: true,
+          },
+        }),
+      ]);
+
+      return {
+        products,
+        total,
+        page: pageNum,
+        totalPages: Math.ceil(total / limitNum),
+      };
+    };
+
+    // 3. EXECUTE WITH REDIS CACHE (TTL: 300 seconds / 5 mins)
+    // This absorbs heavy traffic. If 1,000 users search for "T-Shirts" on page 1,
+    // your database is only hit ONCE every 5 minutes.
+    const results = await fetchCached(
+      SEARCH_CACHE_PREFIX,
+      cacheKey,
+      dbQuery,
+      300,
+    );
+
+    res.status(200).json(results);
+  } catch (error) {
+    console.error("Full Product Search Error:", error);
+    next(error);
   }
 };
 
@@ -331,7 +466,6 @@ export const createProduct = async (req, res, next) => {
       metaDescription,
       keywords,
       tags,
-      // 🚨 NEW: Destructure the marketplace links
       avitoLink,
       yandexmarketLink,
       ozonLink,
@@ -439,7 +573,6 @@ export const createProduct = async (req, res, next) => {
         thumbImage: thumbUrl,
         imageArray: imagesUrls,
         tags: parsedTags,
-        // 🚨 NEW: Inject marketplace links into the database creation
         avitoLink: cleanLink(avitoLink),
         yandexmarketLink: cleanLink(yandexmarketLink),
         ozonLink: cleanLink(ozonLink),
@@ -452,6 +585,8 @@ export const createProduct = async (req, res, next) => {
     });
 
     await invalidatePattern(`${CACHE_PREFIX}:*`);
+    await invalidatePattern(`${SEARCH_CACHE_PREFIX}:*`);
+
     res.status(201).json({ success: true, data: product });
   } catch (error) {
     next(error);
@@ -642,6 +777,8 @@ export const updateProduct = async (req, res, next) => {
     });
 
     await invalidatePattern(`${CACHE_PREFIX}:*`);
+    await invalidatePattern(`${SEARCH_CACHE_PREFIX}:*`);
+
     res.status(200).json({ success: true, data: updatedProduct });
   } catch (error) {
     next(error);

@@ -103,12 +103,10 @@ export const createCategory = async (req, res, next) => {
   try {
     let { name, slug, description, parentId } = req.body;
 
-    // 🚨 FIX: Auto-generate the slug if the frontend didn't send one
     if (!slug && name) {
       slug = generateSlug(name);
     }
 
-    // Validate Parent ID if provided
     if (parentId) {
       const parentExists = await prisma.category.findUnique({
         where: { id: parentId },
@@ -120,7 +118,6 @@ export const createCategory = async (req, res, next) => {
       }
     }
 
-    // Handle optional category image
     let thumbUrl = null;
     if (req.file) {
       thumbUrl = await optimizeAndUpload(req.file, "categories", slug, 400);
@@ -129,14 +126,16 @@ export const createCategory = async (req, res, next) => {
     const category = await prisma.category.create({
       data: {
         name,
-        slug, // Now guaranteed to exist
+        slug,
         description,
         parentId: parentId || null,
         thumbImage: thumbUrl,
       },
     });
 
+    // 🚨 FIX: Invalidate both the Category Tree AND Search autocomplete caches
     await invalidatePattern(`${CACHE_PREFIX}:*`);
+    await invalidatePattern(`${SEARCH_CACHE_PREFIX}:*`);
 
     res.status(201).json({ success: true, data: category });
   } catch (error) {
@@ -174,7 +173,6 @@ export const updateCategory = async (req, res, next) => {
         .json({ success: false, message: "Category not found" });
     }
 
-    // 🚨 FIX: Auto-generate new slug if name is updated but slug isn't provided
     if (name && !slug) {
       slug = generateSlug(name);
     }
@@ -200,7 +198,9 @@ export const updateCategory = async (req, res, next) => {
       },
     });
 
+    // 🚨 FIX: Invalidate both the Category Tree AND Search autocomplete caches
     await invalidatePattern(`${CACHE_PREFIX}:*`);
+    await invalidatePattern(`${SEARCH_CACHE_PREFIX}:*`);
 
     res.status(200).json({ success: true, data: updatedCategory });
   } catch (error) {
@@ -228,7 +228,10 @@ export const deleteCategory = async (req, res, next) => {
     }
 
     await prisma.category.delete({ where: { id } });
+
+    // 🚨 FIX: Invalidate both the Category Tree AND Search autocomplete caches
     await invalidatePattern(`${CACHE_PREFIX}:*`);
+    await invalidatePattern(`${SEARCH_CACHE_PREFIX}:*`);
 
     res
       .status(200)

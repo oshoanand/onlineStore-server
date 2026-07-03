@@ -1,5 +1,27 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalEnv": [
+    "NODE_ENV",
+    "REDIS_HOST",
+    "REDIS_PORT",
+    "REDIS_PASSWORD",
+    "POSTGRES_DB_PASSWORD",
+    "MINIO_ENDPOINT",
+    "MINIO_PORT",
+    "MINIO_USE_SSL",
+    "MINIO_PASSWORD",
+    "MINIO_ACCESS_KEY",
+    "MINIO_SECRET_KEY",
+    "MINIO_BUCKET_NAME",
+    "JWT_SECRET",
+    "JWT_EXPIRES_IN",
+    "INTERNAL_API_SECRET",
+    "USER_SERVICE_URL",
+    "PRODUCT_SERVICE_URL",
+    "ORDER_SERVICE_URL",
+    "PAYMENT_SERVICE_URL",
+    "NOTIFICATION_SERVICE_URL"
+  ],
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],
@@ -25,7 +47,6 @@
       "cache": false,
       "env": ["DATABASE_URL"]
     },
-
     "clean": {
       "cache": false
     }

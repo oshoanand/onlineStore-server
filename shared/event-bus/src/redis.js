@@ -1,16 +1,18 @@
 import Redis from "ioredis";
-import "dotenv/config";
+import "./env-loader.js";
 
 const DEFAULT_TTL = 3600 * 24 * 2; // 2 days
 
 // ==========================================
 // 1. SHARED REDIS CONFIGURATION
 // ==========================================
+
 const redisOptions = {
   host: process.env.REDIS_HOST || "127.0.0.1",
   port: Number(process.env.REDIS_PORT) || 6379,
-  password: process.env.REDIS_PASSWORD || "",
-  // 🚨 CRITICAL: Prevents commands from hanging forever if Redis drops mid-flight
+  password: process.env.REDIS_PASSWORD || undefined,
+
+  // Prevents commands from hanging forever if Redis drops mid-flight
   maxRetriesPerRequest: 3,
   retryStrategy(times) {
     if (times > 5) {

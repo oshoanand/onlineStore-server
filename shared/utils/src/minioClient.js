@@ -1,19 +1,19 @@
 import * as Minio from "minio";
-import "dotenv/config";
+import "./env-loader.js";
 
 // 1. Initialize the Native MinIO Client
 export const minioClient = new Minio.Client({
   endPoint: process.env.MINIO_ENDPOINT || "localhost",
   port: parseInt(process.env.MINIO_PORT) || 9000,
-  useSSL: process.env.MINIO_USE_SSL === "false", // false for local dev
+  // ✅ THE FIX: Only use SSL if the env variable is explicitly "true"
+  useSSL: process.env.MINIO_USE_SSL === "true",
   accessKey: process.env.MINIO_ACCESS_KEY || "minioadmin",
   secretKey: process.env.MINIO_SECRET_KEY || "minioadmin123",
 });
 
-export const MINIO_BUCKET_NAME =
-  process.env.MINIO_BUCKET_NAME || "shop-uploads";
+export const MINIO_BUCKET_NAME = process.env.MINIO_BUCKET_NAME || "shop";
 export const MINIO_PUBLIC_URL =
-  process.env.MINIO_PUBLIC_URL || "http://localhost:9000/shop-uploads";
+  process.env.MINIO_PUBLIC_URL || "http://localhost:9000/shop";
 
 // 2. Auto-Initialize Bucket & Public Policies
 export const initializeMinio = async () => {

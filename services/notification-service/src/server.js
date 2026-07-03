@@ -1,3 +1,4 @@
+import "./env-loader.js";
 import app from "./app.js";
 import { logger } from "@shop/utils";
 import http from "http";

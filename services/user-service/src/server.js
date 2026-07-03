@@ -1,3 +1,4 @@
+import "./env-loader.js";
 import app from "./app.js";
 import { connectRedis, disconnectRedis } from "@shop/event-bus";
 import { logger, initializeMinio } from "@shop/utils";
